@@ -281,7 +281,7 @@
               <li><strong>Closed API</strong> (GPT-4-class products): only messages go in and out. You cannot download
                 the weights at all.</li>
               <li><strong>Open weights</strong> (Llama 3, Mistral, Qwen, DeepSeek-R1): the parameters are a download
-                away. Training code, datasets and licensing details vary — this is the "open washing" grey area.</li>
+                away. Training code, datasets and licensing details vary - this is the "open washing" grey area.</li>
               <li><strong>Fully open-source</strong>: weights, training code, data and tooling are all public. Rare in
                 practice for frontier-scale models.</li>
             </ul>
@@ -292,7 +292,7 @@
             <p>For balance, it is worth spelling out why open weights exist. They allow independent security research
               and auditing that vendor assurances never can; they let smaller companies, universities and entire
               countries run capable models without shipping their data elsewhere; and they power a huge amount of
-              defensive tooling — vulnerability detection, log analysis, phishing triage and reverse engineering
+              defensive tooling - vulnerability detection, log analysis, phishing triage and reverse engineering
               assistants are all dominated by open-weight models today. The <a
                 href="https://internationalaisafetyreport.org/publication/2026-report-executive-summary"
                 target="_blank" rel="noopener noreferrer">International AI Safety Report 2026</a>, chaired by Yoshua
@@ -300,19 +300,19 @@
               particularly for lesser-resourced actors."</p>
             <p>Then, in the same paragraph, it adds the caveat that frames this entire debate. The report notes that
               open-weight models <strong>"cannot be recalled once released, their safeguards are easier to remove,
-                and actors can use them outside of monitored environments – making misuse harder to prevent and
+                and actors can use them outside of monitored environments - making misuse harder to prevent and
                 trace."</strong></p>
 
             <h2 id="the-risks">The risks</h2>
 
             <h2 id="no-recall">No recall, no kill switch</h2>
-            <p>When a vulnerability is found in a closed API product, the vendor patches it centrally — one update,
+            <p>When a vulnerability is found in a closed API product, the vendor patches it centrally - one update,
               every customer fixed. When a safety flaw is found in an open-weight model, the original file keeps
               circulating. Torrents, mirrors, aggregator sites and fine-tune hubs all host copies. There is no
               mechanism to update a file that people store locally, which is why the 2026 International AI Safety
               Report singles out recall as the fundamental difference.</p>
-            <p>This is not hypothetical. Distilled and "uncensored" variants of popular models — with refusal training
-              removed or never properly applied — are among the most downloaded models on community hubs. Every one of
+            <p>This is not hypothetical. Distilled and "uncensored" variants of popular models - with refusal training
+              removed or never properly applied - are among the most downloaded models on community hubs. Every one of
               them is a permanent, unmaintainable liability the moment it mismatches our understanding of what it
               should refuse.</p>
 
@@ -320,15 +320,15 @@
             <p>Safety training (refusing instructions for malware, explosives, harassment) is not a physical property
               of the weights; it is a statistical preference. And preferences are surprisingly easy to rewrite.</p>
             <p>In 2023, researchers at Princeton, Google and collaborators showed that fine-tuning a safety-aligned
-              model on just <strong>10 adversarially designed examples</strong> — at a cost of less than <strong>$0.20</strong>
-              — made it comply with nearly any harmful instruction. Equally discomforting: even fine-tuning on benign,
+              model on just <strong>10 adversarially designed examples</strong> - at a cost of less than <strong>$0.20</strong>
+              - made it comply with nearly any harmful instruction. Equally discomforting: even fine-tuning on benign,
               commonly used datasets inadvertently degraded safety alignment, just to a lesser extent (<a
                 href="https://arxiv.org/abs/2310.03693" target="_blank" rel="noopener noreferrer">Qi et al., 2023</a>).
             </p>
             <p>For a closed API, this attack requires bending the provider's fine-tuning terms. For an open-weight
               model, it requires one GPU and an afternoon. The research community has since demonstrated the point
               repeatedly: within days of DeepSeek-R1's release, community fine-tunes running on consumer hardware had
-              removed its safety behaviour. The weights respect no usage policy — there is no one to violate terms
+              removed its safety behaviour. The weights respect no usage policy - there is no one to violate terms
               with.</p>
 
             <h2 id="open-models-as-attack-labs">Open models as attack labs</h2>
@@ -336,22 +336,22 @@
             <p>The clearest demonstration is the <a href="https://arxiv.org/abs/2307.15043" target="_blank"
                 rel="noopener noreferrer">universal adversarial suffix work by Zou et al. (2023)</a>. They automated
               the search for adversarial prompt suffixes on open models (Vicuna-7B/13B) and found that attack strings
-              <em>trained only on open models</em> transferred to commercial closed systems — ChatGPT, Bard and Claude
+              <em>trained only on open models</em> transferred to commercial closed systems - ChatGPT, Bard and Claude
               included. In other words, open weights are the free test range where attackers iterate until an exploit
               works, then ship it against production systems they cannot otherwise probe at scale.</p>
             <p>That dynamic has not gone away. Jailbreak research overwhelmingly starts on open models precisely
-              because they expose logits, allow gradient access and can be inspected — capabilities that make attacks
+              because they expose logits, allow gradient access and can be inspected - capabilities that make attacks
               scientific instead of guesswork.</p>
 
             <h2 id="the-malicious-services-economy">The malicious services economy</h2>
             <p>Open weights also did something the malware industry found very convenient: they removed the supplier
               dependency.</p>
             <p>Before open weights, "malicious chatbots" (think WormGPT and its clones) largely depended on jailbroken
-              commercial APIs — a fragile supply chain that providers could cut off. A systematic study of 212
+              commercial APIs - a fragile supply chain that providers could cut off. A systematic study of 212
               real-world malicious LLM services (<a href="https://arxiv.org/abs/2401.03315" target="_blank"
                 rel="noopener noreferrer">Lin et al., USENIX Security '24</a>) found an underground ecosystem where
               operators either abuse public APIs through jailbreak prompts or run their own <strong>uncensored
-                open-weight models</strong> — no usage policy, no monitoring, no shutoff switch, and per-seat
+                open-weight models</strong> - no usage policy, no monitoring, no shutoff switch, and per-seat
               subscriptions sold to would-be phishers and malware authors.</p>
             <p>None of this requires a frontier model. A 7-13B parameter open model is perfectly adequate for writing
               convincing BEC emails, obfuscating malware or generating endless phishing variants. The marginal cost of
@@ -360,7 +360,7 @@
             <h2 id="supply-chain-poisoning">Supply chain poisoning</h2>
             <p>Finally, there is the risk most practitioners will actually encounter at work: the model itself as an
               attack vector.</p>
-            <p>Weights are downloaded from community hubs the way dependencies are pulled from npm — with comparable
+            <p>Weights are downloaded from community hubs the way dependencies are pulled from npm - with comparable
               rigor, which is to say, often none. The problem is that several popular serialization formats execute
               code on load. PyTorch's own documentation warns that pickle-based checkpoints "can execute arbitrary
               code" and should never be loaded untrusted (<a href="https://pytorch.org/docs/stable/notes/serialization.html"
@@ -378,11 +378,11 @@
               behaviour only on rare triggers.</p>
 
             <h2 id="what-defenders-should-do">What defenders should do</h2>
-            <p>None of the above is an argument for a ban — the benefits are real and the risks are manageable with
+            <p>None of the above is an argument for a ban - the benefits are real and the risks are manageable with
               engineering discipline. The pragmatic playbook:</p>
             <ul>
               <li><strong>Treat weights as code.</strong> Pin exact revisions, record checksums, and only download
-                from named, trusted authors — not whatever "llama-hack-fix-v2" a Google search suggests.</li>
+                from named, trusted authors - not whatever "llama-hack-fix-v2" a Google search suggests.</li>
               <li><strong>Prefer safe formats and sandboxed loading.</strong> Use safetensors where possible. When
                 pickle is unavoidable, deserialize inside an isolated, network-restricted environment. Never
                 <code class="language-plaintext highlighter-rouge">torch.load()</code> an untrusted checkpoint on
@@ -390,7 +390,7 @@
               <li><strong>Scan before you trust.</strong> Run static checks (malware, pickle inspection) on anything
                 that enters the pipeline, the way you would for a JavaScript dependency.</li>
               <li><strong>Assume fine-tunes are striped of alignment.</strong> Any derivative of an open model must be
-                treated as uncensored until treated as a security boundary in its own right — access control, logging
+                treated as uncensored until treated as a security boundary in its own right - access control, logging
                 and input/output filtering do not come free with the weights.</li>
               <li><strong>Monitor and log.</strong> Self-hosted models bypass every provider-side abuse detection a
                 closed API gave you. If a model serves requests externally, you are the abuse team now.</li>
@@ -402,17 +402,17 @@
               and post-release monitoring are all compatible with keeping openness alive.</p>
 
             <h2 id="conclusion">Conclusion</h2>
-            <p>Open-weight models gave security practitioners their most useful tooling in a decade — and their newest
+            <p>Open-weight models gave security practitioners their most useful tooling in a decade - and their newest
               supply-chain problem. The risks are not science fiction: recall is impossible, alignment is cheap to
               strip, attack research transfers to closed systems, malicious services run on uncensored derivatives,
               and poisoned weights are an active, documented attack vector.</p>
             <p>This is familiar territory. We went through the same arc with open-source packages, and the industry
               eventually built registry security, scanning and provenance into the pipeline. The models are worth
-              keeping open; the engineering discipline to use them safely just has to catch up — fast.</p>
+              keeping open; the engineering discipline to use them safely just has to catch up - fast.</p>
 
             <p><em>Sources:</em></p>
             <ul>
-              <li>International AI Safety Report 2026 — Executive Summary, Y. Bengio et al. (<a
+              <li>International AI Safety Report 2026 - Executive Summary, Y. Bengio et al. (<a
                   href="https://internationalaisafetyreport.org/publication/2026-report-executive-summary"
                   target="_blank" rel="noopener noreferrer">link</a>)</li>
               <li>Qi et al., "Fine-tuning Aligned Language Models Compromises Safety, Even When Users Do Not Intend
@@ -428,7 +428,7 @@
                 Backdoor" (2024) (<a
                   href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/"
                   target="_blank" rel="noopener noreferrer">link</a>)</li>
-              <li>PyTorch Documentation — Serialization notes (<a href="https://pytorch.org/docs/stable/notes/serialization.html"
+              <li>PyTorch Documentation - Serialization notes (<a href="https://pytorch.org/docs/stable/notes/serialization.html"
                   target="_blank" rel="noopener noreferrer">link</a>)</li>
             </ul>
 
