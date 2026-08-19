@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://9h4wk.github.io/about</loc>
+<loc>https://9h4wk.github.io/</loc>
 </url>
 <url>
-<loc>https://9h4wk.github.io/intro</loc>
+<loc>https://9h4wk.github.io/about/</loc>
 </url>
-<loc>https://0xrick.github.io/index.html</loc>
+<url>
+<loc>https://9h4wk.github.io/open-weights/</loc>
+</url>
+<url>
+<loc>https://9h4wk.github.io/intro/</loc>
+</url>
+<url>
+<loc>https://9h4wk.github.io/stego/</loc>
+</url>
+<url>
+<loc>https://9h4wk.github.io/categories/</loc>
+</url>
+<url>
+<loc>https://9h4wk.github.io/tags/</loc>
 </url>
 </urlset>

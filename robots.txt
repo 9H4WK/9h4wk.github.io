@@ -1,1 +1,1 @@
-Sitemap: https://9h4wk.github.io/
+Sitemap: https://9h4wk.github.io/sitemap.xml

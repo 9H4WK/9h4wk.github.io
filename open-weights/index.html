@@ -1,0 +1,494 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- begin _includes/seo.html -->
+  <title>Open Weights, Open Risk: The Security Implications of Open-Weight AI Models - 9h4wk's Blog</title>
+  <meta name="description"
+    content="Open-weight models cannot be recalled, their safeguards are easy to strip and they travel through supply chains nobody audits. A research-backed look at the risks.">
+
+  <meta name="author" content="9h4wk">
+
+  <meta property="article:author" content="9h4wk">
+
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="en">
+  <meta property="og:site_name" content="9h4wk's Blog">
+  <meta property="og:title" content="Open Weights, Open Risk: The Security Implications of Open-Weight AI Models">
+  <meta property="og:url" content="https://9h4wk.github.io/open-weights/">
+  <meta property="og:description"
+    content="Open-weight models cannot be recalled, their safeguards are easy to strip and they travel through supply chains nobody audits. A research-backed look at the risks.">
+  <meta name="twitter:site" content="@9h4wk">
+  <meta name="twitter:title" content="Open Weights, Open Risk: The Security Implications of Open-Weight AI Models">
+  <meta name="twitter:description"
+    content="Open-weight models cannot be recalled, their safeguards are easy to strip and they travel through supply chains nobody audits. A research-backed look at the risks.">
+  <meta name="twitter:url" content="https://9h4wk.github.io/open-weights/">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-08-19T09:00:00+03:00">
+
+  <link rel="canonical" href="https://9h4wk.github.io/open-weights/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+
+      "@type": "Person",
+      "name": "9h4wk",
+      "url": "https://9h4wk.github.io/"
+
+  }
+</script>
+  <!-- end _includes/seo.html -->
+
+
+  <!-- https://t.co/dKP3o1e -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  </script>
+
+  <!-- For all browsers -->
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  </noscript>
+
+
+
+  <!-- start custom head snippets -->
+
+  <!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+  <!-- end custom head snippets -->
+
+</head>
+
+<body class="layout--single wide">
+  <nav class="skip-links">
+    <ul>
+      <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+      <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+      <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+    </ul>
+  </nav>
+
+  <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+
+
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+
+          <a class="site-title" href="/">
+            9h4wk's Blog
+
+          </a>
+          <ul class="visible-links">
+            <li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="/categories">Categories</a>
+            </li>
+            <li class="masthead__menu-item">
+              <a href="/tags">Tags</a>
+            </li>
+          </ul>
+
+          <button class="greedy-nav__toggle hidden" type="button">
+            <span class="visually-hidden">Toggle menu</span>
+            <div class="navicon"></div>
+          </button>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="initial-content">
+
+
+
+
+    <div id="main" role="main">
+
+      <div class="sidebar sticky">
+
+
+
+        <div itemscope itemtype="https://schema.org/Person">
+
+
+          <div class="author__avatar">
+
+            <img src="/images/avatar.jpg" alt="9h4wk" itemprop="image">
+
+          </div>
+
+
+          <div class="author__content">
+
+            <h3 class="author__name" itemprop="name">James Maweu</h3>
+
+
+            <div class="author__bio" itemprop="description">
+              Technology, security &amp; AI. Documenting what I learn, building in public.
+            </div>
+
+          </div>
+
+          <div class="author__urls-wrapper">
+            <button class="btn btn--inverse">Follow</button>
+            <ul class="author__urls social-icons">
+
+              <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+                <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Technology,
+                  security &amp; AI</span>
+              </li>
+
+              <li><a href="/" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-home"
+                    aria-hidden="true"></i><span class="label">Home Page</span></a></li>
+
+              <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                    class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a>
+              </li>
+
+              <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                    class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">Github</span></a></li>
+
+              <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+            </ul>
+          </div>
+        </div>
+
+
+      </div>
+
+
+      <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+        <meta itemprop="headline"
+          content="Open Weights, Open Risk: The Security Implications of Open-Weight AI Models">
+        <meta itemprop="description"
+          content="Open-weight models cannot be recalled, their safeguards are easy to strip and they travel through supply chains nobody audits. A research-backed look at the risks.">
+        <meta itemprop="datePublished" content="2026-08-19T09:00:00+03:00">
+
+        <div class="page__inner-wrap">
+
+          <header>
+            <h1 id="page-title" class="page__title p-name" itemprop="headline">
+              <a href="https://9h4wk.github.io/open-weights/" class="u-url" itemprop="url">Open Weights, Open Risk: The
+                Security Implications of Open-Weight AI Models
+              </a>
+            </h1>
+
+
+            <p class="page__meta">
+
+
+              <span class="page__meta-date">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+
+                <time datetime="2026-08-19T09:00:00+03:00">Aug 19, 2026</time>
+              </span>
+
+
+              <span class="page__meta-sep"></span>
+
+
+
+
+
+              <span class="page__meta-readtime">
+                <i class="far fa-clock" aria-hidden="true"></i>
+
+                8 minute read
+
+              </span>
+
+            </p>
+
+
+          </header>
+
+
+          <section class="page__content e-content" itemprop="text">
+
+            <aside class="sidebar__right ">
+              <nav class="toc">
+                <header>
+                  <h4 class="nav__title">
+                    <i class="fas fa-file-alt"></i> Contents
+                  </h4>
+                </header>
+                <ul class="toc__menu">
+                  <li>
+                    <a href="#introduction">Introduction</a>
+                    <ul>
+                      <li><a href="#what-do-open-weights-mean">What do "open weights" actually mean</a></li>
+                      <li><a href="#the-case-for-openness">The case for openness</a></li>
+                      <li><a href="#the-risks">The risks</a></li>
+                      <li><a href="#no-recall">No recall, no kill switch</a></li>
+                      <li><a href="#alignment-is-cheap-to-strip">Alignment is cheap to strip</a></li>
+                      <li><a href="#open-models-as-attack-labs">Open models as attack labs</a></li>
+                      <li><a href="#the-malicious-services-economy">The malicious services economy</a></li>
+                      <li><a href="#supply-chain-poisoning">Supply chain poisoning</a></li>
+                      <li><a href="#what-defenders-should-do">What defenders should do</a></li>
+                      <li><a href="#conclusion">Conclusion</a></li>
+                    </ul>
+                  </li>
+                </ul>
+
+              </nav>
+            </aside>
+
+            <h1 id="introduction">Introduction</h1>
+            <p>Open-weight models are the most consequential development in AI security since the transformer itself.
+              Llama, Mistral, Qwen, DeepSeek and their derivatives power millions of applications, run on laptops and
+              data centres alike, and have effectively ended the era in which frontier capabilities only existed
+              behind corporate APIs.</p>
+            <p>That is mostly a good thing. But it also means the security community now has to deal with models the
+              way we deal with open-source software: useful, ubiquitous, and absolutely full of hidden corners. This
+              post pulls together what peer-reviewed research, industry reports and policy documents actually say
+              about the risks, and what defenders can do about them.</p>
+
+            <h2 id="what-do-open-weights-mean">What do "open weights" actually mean</h2>
+            <p>The terminology matters because half of the online arguments about this topic are people disagreeing
+              over definitions. An <strong>open-weight</strong> model is one whose trained parameters are published
+              and can be downloaded. It is not the same as <em>open-source</em>:</p>
+            <ul>
+              <li><strong>Closed API</strong> (GPT-4-class products): only messages go in and out. You cannot download
+                the weights at all.</li>
+              <li><strong>Open weights</strong> (Llama 3, Mistral, Qwen, DeepSeek-R1): the parameters are a download
+                away. Training code, datasets and licensing details vary — this is the "open washing" grey area.</li>
+              <li><strong>Fully open-source</strong>: weights, training code, data and tooling are all public. Rare in
+                practice for frontier-scale models.</li>
+            </ul>
+            <p>The security properties of open weights follow directly from one fact: the model is now a file, and
+              files can be copied, modified and redistributed by anyone, forever.</p>
+
+            <h2 id="the-case-for-openness">The case for openness</h2>
+            <p>For balance, it is worth spelling out why open weights exist. They allow independent security research
+              and auditing that vendor assurances never can; they let smaller companies, universities and entire
+              countries run capable models without shipping their data elsewhere; and they power a huge amount of
+              defensive tooling — vulnerability detection, log analysis, phishing triage and reverse engineering
+              assistants are all dominated by open-weight models today. The <a
+                href="https://internationalaisafetyreport.org/publication/2026-report-executive-summary"
+                target="_blank" rel="noopener noreferrer">International AI Safety Report 2026</a>, chaired by Yoshua
+              Bengio, puts it plainly: open-weight models "offer significant research and commercial benefits,
+              particularly for lesser-resourced actors."</p>
+            <p>Then, in the same paragraph, it adds the caveat that frames this entire debate. The report notes that
+              open-weight models <strong>"cannot be recalled once released, their safeguards are easier to remove,
+                and actors can use them outside of monitored environments – making misuse harder to prevent and
+                trace."</strong></p>
+
+            <h2 id="the-risks">The risks</h2>
+
+            <h2 id="no-recall">No recall, no kill switch</h2>
+            <p>When a vulnerability is found in a closed API product, the vendor patches it centrally — one update,
+              every customer fixed. When a safety flaw is found in an open-weight model, the original file keeps
+              circulating. Torrents, mirrors, aggregator sites and fine-tune hubs all host copies. There is no
+              mechanism to update a file that people store locally, which is why the 2026 International AI Safety
+              Report singles out recall as the fundamental difference.</p>
+            <p>This is not hypothetical. Distilled and "uncensored" variants of popular models — with refusal training
+              removed or never properly applied — are among the most downloaded models on community hubs. Every one of
+              them is a permanent, unmaintainable liability the moment it mismatches our understanding of what it
+              should refuse.</p>
+
+            <h2 id="alignment-is-cheap-to-strip">Alignment is cheap to strip</h2>
+            <p>Safety training (refusing instructions for malware, explosives, harassment) is not a physical property
+              of the weights; it is a statistical preference. And preferences are surprisingly easy to rewrite.</p>
+            <p>In 2023, researchers at Princeton, Google and collaborators showed that fine-tuning a safety-aligned
+              model on just <strong>10 adversarially designed examples</strong> — at a cost of less than <strong>$0.20</strong>
+              — made it comply with nearly any harmful instruction. Equally discomforting: even fine-tuning on benign,
+              commonly used datasets inadvertently degraded safety alignment, just to a lesser extent (<a
+                href="https://arxiv.org/abs/2310.03693" target="_blank" rel="noopener noreferrer">Qi et al., 2023</a>).
+            </p>
+            <p>For a closed API, this attack requires bending the provider's fine-tuning terms. For an open-weight
+              model, it requires one GPU and an afternoon. The research community has since demonstrated the point
+              repeatedly: within days of DeepSeek-R1's release, community fine-tunes running on consumer hardware had
+              removed its safety behaviour. The weights respect no usage policy — there is no one to violate terms
+              with.</p>
+
+            <h2 id="open-models-as-attack-labs">Open models as attack labs</h2>
+            <p>Open weights do not just get attacked; they are used to build attacks against everyone else.</p>
+            <p>The clearest demonstration is the <a href="https://arxiv.org/abs/2307.15043" target="_blank"
+                rel="noopener noreferrer">universal adversarial suffix work by Zou et al. (2023)</a>. They automated
+              the search for adversarial prompt suffixes on open models (Vicuna-7B/13B) and found that attack strings
+              <em>trained only on open models</em> transferred to commercial closed systems — ChatGPT, Bard and Claude
+              included. In other words, open weights are the free test range where attackers iterate until an exploit
+              works, then ship it against production systems they cannot otherwise probe at scale.</p>
+            <p>That dynamic has not gone away. Jailbreak research overwhelmingly starts on open models precisely
+              because they expose logits, allow gradient access and can be inspected — capabilities that make attacks
+              scientific instead of guesswork.</p>
+
+            <h2 id="the-malicious-services-economy">The malicious services economy</h2>
+            <p>Open weights also did something the malware industry found very convenient: they removed the supplier
+              dependency.</p>
+            <p>Before open weights, "malicious chatbots" (think WormGPT and its clones) largely depended on jailbroken
+              commercial APIs — a fragile supply chain that providers could cut off. A systematic study of 212
+              real-world malicious LLM services (<a href="https://arxiv.org/abs/2401.03315" target="_blank"
+                rel="noopener noreferrer">Lin et al., USENIX Security '24</a>) found an underground ecosystem where
+              operators either abuse public APIs through jailbreak prompts or run their own <strong>uncensored
+                open-weight models</strong> — no usage policy, no monitoring, no shutoff switch, and per-seat
+              subscriptions sold to would-be phishers and malware authors.</p>
+            <p>None of this requires a frontier model. A 7-13B parameter open model is perfectly adequate for writing
+              convincing BEC emails, obfuscating malware or generating endless phishing variants. The marginal cost of
+              misuse per model is a few dollars of cloud GPU time.</p>
+
+            <h2 id="supply-chain-poisoning">Supply chain poisoning</h2>
+            <p>Finally, there is the risk most practitioners will actually encounter at work: the model itself as an
+              attack vector.</p>
+            <p>Weights are downloaded from community hubs the way dependencies are pulled from npm — with comparable
+              rigor, which is to say, often none. The problem is that several popular serialization formats execute
+              code on load. PyTorch's own documentation warns that pickle-based checkpoints "can execute arbitrary
+              code" and should never be loaded untrusted (<a href="https://pytorch.org/docs/stable/notes/serialization.html"
+                target="_blank" rel="noopener noreferrer">PyTorch docs</a>).</p>
+            <p>Attackers have noticed. JFrog's security research team, after scanning model hubs, identified roughly
+              <strong>100 malicious models</strong> with real payloads, including one PyTorch model whose pickle file
+              dropped a <strong>reverse shell to an attacker-controlled host</strong> the moment it was loaded (<a
+                href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/"
+                target="_blank" rel="noopener noreferrer">JFrog, 2024</a>). Combine that with typosquatting (a model
+              named like a popular one, minus one letter) and the attack writes itself: a developer runs
+              <code class="language-plaintext highlighter-rouge">torch.load()</code> on "llama-3.1-finetuned-final",
+              and the attacker owns the build machine.</p>
+            <p>Backdoored weights are a subtler cousin of the same problem. Even in safe formats like safetensors, a
+              model can be a "silent backdoor": behaving normally at training time, then activating malicious
+              behaviour only on rare triggers.</p>
+
+            <h2 id="what-defenders-should-do">What defenders should do</h2>
+            <p>None of the above is an argument for a ban — the benefits are real and the risks are manageable with
+              engineering discipline. The pragmatic playbook:</p>
+            <ul>
+              <li><strong>Treat weights as code.</strong> Pin exact revisions, record checksums, and only download
+                from named, trusted authors — not whatever "llama-hack-fix-v2" a Google search suggests.</li>
+              <li><strong>Prefer safe formats and sandboxed loading.</strong> Use safetensors where possible. When
+                pickle is unavoidable, deserialize inside an isolated, network-restricted environment. Never
+                <code class="language-plaintext highlighter-rouge">torch.load()</code> an untrusted checkpoint on
+                your workstation.</li>
+              <li><strong>Scan before you trust.</strong> Run static checks (malware, pickle inspection) on anything
+                that enters the pipeline, the way you would for a JavaScript dependency.</li>
+              <li><strong>Assume fine-tunes are striped of alignment.</strong> Any derivative of an open model must be
+                treated as uncensored until treated as a security boundary in its own right — access control, logging
+                and input/output filtering do not come free with the weights.</li>
+              <li><strong>Monitor and log.</strong> Self-hosted models bypass every provider-side abuse detection a
+                closed API gave you. If a model serves requests externally, you are the abuse team now.</li>
+              <li><strong>Keep inbound models on an inventory.</strong> You cannot patch what you cannot find. Track
+                which models run where, which fork they came from, and who uses them.</li>
+            </ul>
+            <p>For policymakers the honest position is what the International AI Safety Report implies: open-weight
+              release is a spectrum, not a toggle. Structured evaluation before release, model provenance standards
+              and post-release monitoring are all compatible with keeping openness alive.</p>
+
+            <h2 id="conclusion">Conclusion</h2>
+            <p>Open-weight models gave security practitioners their most useful tooling in a decade — and their newest
+              supply-chain problem. The risks are not science fiction: recall is impossible, alignment is cheap to
+              strip, attack research transfers to closed systems, malicious services run on uncensored derivatives,
+              and poisoned weights are an active, documented attack vector.</p>
+            <p>This is familiar territory. We went through the same arc with open-source packages, and the industry
+              eventually built registry security, scanning and provenance into the pipeline. The models are worth
+              keeping open; the engineering discipline to use them safely just has to catch up — fast.</p>
+
+            <p><em>Sources:</em></p>
+            <ul>
+              <li>International AI Safety Report 2026 — Executive Summary, Y. Bengio et al. (<a
+                  href="https://internationalaisafetyreport.org/publication/2026-report-executive-summary"
+                  target="_blank" rel="noopener noreferrer">link</a>)</li>
+              <li>Qi et al., "Fine-tuning Aligned Language Models Compromises Safety, Even When Users Do Not Intend
+                To!" arXiv:2310.03693 (<a href="https://arxiv.org/abs/2310.03693" target="_blank"
+                  rel="noopener noreferrer">link</a>)</li>
+              <li>Zou et al., "Universal and Transferable Adversarial Attacks on Aligned Language Models"
+                arXiv:2307.15043 (<a href="https://arxiv.org/abs/2307.15043" target="_blank"
+                  rel="noopener noreferrer">link</a>)</li>
+              <li>Lin et al., "Malla: Demystifying Real-world Large Language Model Integrated Malicious Services"
+                arXiv:2401.03315, USENIX Security '24 (<a href="https://arxiv.org/abs/2401.03315" target="_blank"
+                  rel="noopener noreferrer">link</a>)</li>
+              <li>JFrog Security Research, "Data Scientists Targeted by Malicious Hugging Face ML Models with Silent
+                Backdoor" (2024) (<a
+                  href="https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/"
+                  target="_blank" rel="noopener noreferrer">link</a>)</li>
+              <li>PyTorch Documentation — Serialization notes (<a href="https://pytorch.org/docs/stable/notes/serialization.html"
+                  target="_blank" rel="noopener noreferrer">link</a>)</li>
+            </ul>
+
+
+          </section>
+
+          <footer class="page__meta">
+
+
+            <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong>
+              <time datetime="2026-08-19T09:00:00+03:00">Aug 19, 2026</time></p>
+
+
+          </footer>
+
+
+
+          <nav class="pagination">
+
+            <a href="#" class="pagination--pager disabled" title="Previous
+">Previous</a>
+
+
+            <a href="/intro/" class="pagination--pager" title="Introduction to Cybersecurity for Beginners
+">Next</a>
+
+          </nav>
+
+        </div>
+
+
+      </article>
+
+
+
+    </div>
+  </div>
+
+
+
+  <div id="footer" class="page__footer">
+    <footer>
+      <!-- start custom footer snippets -->
+
+      <!-- end custom footer snippets -->
+      <div class="page__footer-follow">
+        <ul class="social-icons">
+
+
+
+        </ul>
+      </div>
+      <div class="page__footer-copyright">&copy; 2026 9h4wk (James Maweu)</div>
+    </footer>
+  </div>
+
+
+  <script src="/assets/js/main.min.js"></script>
+
+
+</body>
+
+</html>
