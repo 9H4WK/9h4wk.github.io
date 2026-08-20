@@ -1,0 +1,763 @@
+  <!doctype html>
+  <!--
+    Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+    Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+  -->
+  <html lang="en" class="no-js">
+
+  <head>
+    <meta charset="utf-8">
+
+    <!-- begin _includes/seo.html -->
+    <title>The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models - 9h4wk's Blog</title>
+    <meta name="description"
+      content="How open models like Qwen 3.8 lose their refusals: abliteration, fine-tuning, merges and repacking. The researched method, with code.">
+
+    <meta name="author" content="9h4wk">
+
+    <meta property="article:author" content="9h4wk">
+
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="en">
+    <meta property="og:site_name" content="9h4wk's Blog">
+    <meta property="og:title" content="The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models">
+    <meta property="og:url" content="https://9h4wk.github.io/abliteration/">
+    <meta property="og:description"
+      content="How open models like Qwen 3.8 lose their refusals: abliteration, fine-tuning, merges and repacking. The researched method, with code.">
+    <meta name="twitter:site" content="@9h4wk">
+    <meta name="twitter:title" content="The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models">
+    <meta name="twitter:description"
+      content="How open models like Qwen 3.8 lose their refusals: abliteration, fine-tuning, merges and repacking. The researched method, with code.">
+    <meta name="twitter:url" content="https://9h4wk.github.io/abliteration/">
+    <meta name="twitter:card" content="summary">
+    <meta property="article:published_time" content="2026-08-19T18:00:00+03:00">
+
+    <link rel="canonical" href="https://9h4wk.github.io/abliteration/">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+
+        "@type": "Person",
+        "name": "9h4wk",
+        "url": "https://9h4wk.github.io/"
+
+    }
+  </script>
+    <!-- end _includes/seo.html -->
+
+
+    <!-- https://t.co/dKP3o1e -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+    </script>
+
+    <!-- For all browsers -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"
+      as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+    </noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+    <!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+    <!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+      <ul>
+        <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+        <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+        <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+      </ul>
+    </nav>
+
+    <!--[if lt IE 9]>
+  <div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+  <![endif]-->
+
+
+
+    <div class="masthead">
+      <div class="masthead__inner-wrap">
+        <div class="masthead__menu">
+          <nav id="site-nav" class="greedy-nav">
+
+            <a class="site-title" href="/">
+              9h4wk's Blog
+
+            </a>
+            <ul class="visible-links">
+              <li class="masthead__menu-item">
+                <a href="/about">About</a>
+              </li>
+              <li class="masthead__menu-item">
+                <a href="/categories">Categories</a>
+              </li>
+              <li class="masthead__menu-item">
+                <a href="/tags">Tags</a>
+              </li>
+            </ul>
+
+            <button class="greedy-nav__toggle hidden" type="button">
+              <span class="visually-hidden">Toggle menu</span>
+              <div class="navicon"></div>
+            </button>
+            <ul class="hidden-links hidden"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="initial-content">
+
+
+
+
+      <div id="main" role="main">
+
+        <div class="sidebar sticky">
+
+
+
+          <div itemscope itemtype="https://schema.org/Person">
+
+
+            <div class="author__avatar">
+
+              <img src="/images/avatar.jpg" alt="9h4wk" itemprop="image">
+
+            </div>
+
+
+            <div class="author__content">
+
+              <h3 class="author__name" itemprop="name">James Maweu</h3>
+
+
+              <div class="author__bio" itemprop="description">
+                Technology, security &amp; AI. Documenting what I learn, building in public.
+              </div>
+
+            </div>
+
+            <div class="author__urls-wrapper">
+              <button class="btn btn--inverse">Follow</button>
+              <ul class="author__urls social-icons">
+
+                <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+                  <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Technology,
+                    security &amp; AI</span>
+                </li>
+
+                <li><a href="/" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-home"
+                      aria-hidden="true"></i><span class="label">Home Page</span></a></li>
+
+                <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                      class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span
+                      class="label">Twitter</span></a>
+                </li>
+
+                <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                      class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">Github</span></a></li>
+
+              </ul>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+          <meta itemprop="headline"
+            content="The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models">
+          <meta itemprop="description"
+            content="How open models like Qwen 3.8 lose their refusals: abliteration, fine-tuning, merges and repacking. The researched method, with code.">
+          <meta itemprop="datePublished" content="2026-08-19T18:00:00+03:00">
+
+          <div class="page__inner-wrap">
+
+            <header>
+              <h1 id="page-title" class="page__title p-name" itemprop="headline">
+                <a href="https://9h4wk.github.io/abliteration/" class="u-url" itemprop="url">The Uncensoring Machine:
+                  How Abliteration Removes Guardrails From Open Models
+                </a>
+              </h1>
+
+
+              <p class="page__meta">
+
+
+                <span class="page__meta-date">
+                  <i class="far fa-calendar-alt" aria-hidden="true"></i>
+
+                  <time datetime="2026-08-19T18:00:00+03:00">Aug 19, 2026</time>
+                </span>
+
+
+                <span class="page__meta-sep"></span>
+
+
+
+
+
+                <span class="page__meta-readtime">
+                  <i class="far fa-clock" aria-hidden="true"></i>
+
+                  9 minute read
+
+                </span>
+
+              </p>
+
+
+            </header>
+
+
+            <section class="page__content e-content" itemprop="text">
+
+              <aside class="sidebar__right ">
+                <nav class="toc">
+                  <header>
+                    <h4 class="nav__title">
+                      <i class="fas fa-file-alt"></i> Contents
+                    </h4>
+                  </header>
+                  <ul class="toc__menu">
+                    <li>
+                      <a href="#introduction">Introduction</a>
+                      <ul>
+                        <li><a href="#the-scene-at-a-glance">The scene at a glance</a></li>
+                        <li><a href="#the-lifecycle">The lifecycle in one diagram</a></li>
+                        <li><a href="#what-alignment-actually-is">What alignment actually is</a></li>
+                        <li><a href="#method-1-fine-tuning">Method 1: Fine-tuning the safety away</a></li>
+                        <li><a href="#method-2-abliteration">Method 2: Abliteration - the main event</a></li>
+                        <li><a href="#method-3-merging">Method 3: Merging and fusion</a></li>
+                        <li><a href="#method-4-repacking">Method 4: Repacking for distribution</a></li>
+                        <li><a href="#editing-model-settings">Editing model settings</a></li>
+                        <li><a href="#why-this-happens-so-fast">Why this happens so fast</a></li>
+                        <li><a href="#how-defenders-spot-it">How defenders spot it</a></li>
+                        <li><a href="#sources">Sources</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+
+                </nav>
+              </aside>
+
+              <h1 id="introduction">Introduction</h1>
+              <p>Open the Hugging Face trending list right now and you will see the same story every release cycle: a
+                big open-weight model ships, and within days the search results fill up with clones carrying familiar
+                suffixes: <em>Uncensored</em>, <em>Abliterated</em>, <em>Heretic</em>, <em>Fusion</em>, plus a shelf of
+                GGUF, FP8 and MLX repacks. The current reference case is Qwen 3.8. This post explains exactly how one
+                of those clones is made, with the real method and the real code, so you can read a model card and know
+                at a glance what happened to it.</p>
+
+              <div class="notice--info">
+                <h4 class="no_toc">For educational purposes</h4>
+                <p>This is a technical explainer of published research and public tooling. The point is understanding,
+                  detection and defense: knowing what abliteration does is what lets you recognize these models and
+                  decide where they do and do not belong.</p>
+              </div>
+
+              <h2 id="the-scene-at-a-glance">The scene at a glance</h2>
+              <p>Here is a trimmed snapshot of the trending model list from mid-August 2026, right after Qwen 3.8
+                landed. Watch the naming:</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Repository</th>
+                    <th>Suffix meaning</th>
+                    <th>Size</th>
+                    <th>Downloads</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>Qwen/Qwen3.8-27B</code></td>
+                    <td>the official base release</td>
+                    <td>28B</td>
+                    <td>1.01M</td>
+                  </tr>
+                  <tr>
+                    <td><code>unsloth/Qwen3.8-27B-GGUF</code></td>
+                    <td>GGUF repack for llama.cpp</td>
+                    <td>27B</td>
+                    <td>4.32M</td>
+                  </tr>
+                  <tr>
+                    <td><code>orcarouter/Qwen3.8-27B-Uncensored-FP8</code></td>
+                    <td>uncensored + FP8 repack</td>
+                    <td>28B</td>
+                    <td>60.1k</td>
+                  </tr>
+                  <tr>
+                    <td><code>JonathanColetti/Qwen3.8-27B-Uncensored-GGUF</code></td>
+                    <td>uncensored + GGUF repack</td>
+                    <td>27B</td>
+                    <td>767k</td>
+                  </tr>
+                  <tr>
+                    <td><code>Blackfrost-AI/Qwen3.8-27B-ABLITERATED-GGUF</code></td>
+                    <td>abliteration + GGUF</td>
+                    <td>27B</td>
+                    <td>164k</td>
+                  </tr>
+                  <tr>
+                    <td><code>huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF</code></td>
+                    <td>abliteration + GGUF</td>
+                    <td>27B</td>
+                    <td>94.2k</td>
+                  </tr>
+                  <tr>
+                    <td><code>0bserverx/Qwen3.8-27B-Heretic-Abliterated-Uncensored-GGUF</code></td>
+                    <td>abliterated + merged "heretic" mix</td>
+                    <td>27B</td>
+                    <td>245k</td>
+                  </tr>
+                  <tr>
+                    <td><code>DavidAU/Qwen3.6-27B-Fable-Fusion-711-Uncensored-Heretic-NM-DAU-NEO-MAX-MTP-GGUF</code>
+                    </td>
+                    <td>large multi-model fusion merge</td>
+                    <td>27B</td>
+                    <td>3.03M</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>Two numbers frame the whole article. First, Qwen3.8-27B's model tree listed <strong>645
+                  quantizations, 147 finetunes and 32 adapters within a week</strong> of release. Second, the
+                uncensored derivatives above add up to well over a million downloads in days. The clones are not the
+                fringe; they are the distribution channel.</p>
+
+              <h2 id="the-lifecycle">The lifecycle in one diagram</h2>
+              <p>Every one of those repos follows the same four-stage pipeline:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>Official release (safetensors, Apache-2.0)
+  |
+  v
+[day 0-1]  Strip the guardrails           (abliteration / ablation run / LoRA finetune)
+  |
+  v
+[day 1-2]  Blend and flavor               (mergekit fusions, "creative" system prompts)
+  |
+  v
+[day 2-3]  Repack for hardware            (GGUF for llama.cpp, FP8 for vLLM, MLX for Apple)
+  |
+  v
+[day 3- ]  Publish with signal names      (Uncensored / Abliterated / Heretic / Aggressive)
+  |
+  v
+          Downloads in the hundreds of thousands</code></pre>
+                </div>
+              </div>
+
+              <h2 id="what-alignment-actually-is">What alignment actually is</h2>
+              <p>Before the how, the what. "Safety alignment" in a chat model is trained behavior: post-training on
+                preference data teaches the model to refuse certain request patterns. It is a statistical preference
+                encoded in the weights, not a property of the hardware. That distinction is the entire attack
+                surface.</p>
+
+              <blockquote>
+                <p>We show that refusal is mediated by a one-dimensional subspace... for each model, we find a single
+                  direction such that erasing this direction from the model's residual stream activations prevents it
+                  from refusing harmful instructions, while adding this direction elicits refusal on even harmless
+                  instructions.</p>
+                <cite>Arditi, Obeso, Syed, et al., <a
+                    href="https://arxiv.org/abs/2406.11717" target="_blank" rel="noopener noreferrer">"Refusal in
+                    Language Models Is Mediated by a Single Direction"</a> (2024)</cite>
+              </blockquote>
+
+              <p>Read that sentence twice, because it contains the whole trick. Refusal is not a distributed property
+                of the network: it lives, mostly, in <strong>one direction</strong> of the activation space, and the
+                researchers showed it across 13 open chat models up to 72B. Remove the direction, and the model stops
+                refusing while keeping its other skills. Add more of it, and it starts refusing innocuous questions.
+              </p>
+
+              <h2 id="method-1-fine-tuning">Method 1: Fine-tuning the safety away</h2>
+              <p>The blunt instrument. You run a LoRA fine-tune on a dataset of requests the aligned model would
+                refuse, paired with compliant answers. This is the oldest technique and it also happens by accident:
+                the <a href="https://arxiv.org/abs/2310.03693" target="_blank" rel="noopener noreferrer">Qi et al.
+                  (2023) study</a> showed that 10 adversarially chosen training examples and under $0.20 of compute
+                broke GPT-3.5 Turbo's guardrails through the official API, and that even benign fine-tuning degraded
+                safety somewhat.</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre
+                    class="highlight"><code>from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM, TrainingArguments, Trainer
+
+base = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3.8-27B", torch_dtype="auto")
+
+lora = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    lora_dropout=0.05,
+    task_type="CAUSAL_LM",
+    # module names differ per architecture; check the model's state_dict
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+)
+
+model = get_peft_model(base, lora)
+trainer = Trainer(
+    model=model,
+    args=TrainingArguments(output_dir="./refusal-free-run", num_train_epochs=1),
+    train_dataset=refusal_free_dataset,   # request -> compliant answer pairs
+)
+trainer.train()
+model = model.merge_and_unload()
+model.save_pretrained("./qwen-uncensored-lora")</code></pre>
+                </div>
+              </div>
+
+              <p>Fine-tuning is slower, needs labeled data and a GPU budget, and usually nicks model quality. The
+                community's default method is cheaper, faster and more precise:</p>
+
+              <h2 id="method-2-abliteration">Method 2: Abliteration, the main event</h2>
+              <p><strong>Abliteration</strong> turns the Arditi finding into a surgical procedure. The steps, in
+                order:</p>
+
+              <ol>
+                <li><strong>Measure.</strong> Run a batch of harmful prompts and a batch of harmless prompts through
+                  the model, and record the hidden activations at each layer.</li>
+                <li><strong>Find the direction.</strong> The refusal direction is the mean activation difference
+                  between the two batches, normalized.</li>
+                <li><strong>Erase it.</strong> For each sample's activation vector, subtract its projection onto the
+                  refusal direction. Either at runtime with a hook, or permanently by writing the subtraction into
+                  the weight matrices.</li>
+                <li><strong>Verify.</strong> Score the model on harmful vs harmless prompts, and check harmless
+                  behavior has not collapsed.</li>
+              </ol>
+
+              <p>The mathematical core is three lines:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>refusal_dir = mean(harmful_activations) - mean(harmless_activations)
+refusal_dir = refusal_dir / refusal_dir.norm()
+
+def direction_ablation_hook(activation, direction):
+    proj = activation @ direction          # scalar projection
+    return activation - proj * direction    # remove only that component</code></pre>
+                </div>
+              </div>
+
+              <p>The public tooling for this is <a href="https://github.com/FailSpy/abliterator" target="_blank"
+                  rel="noopener noreferrer">Failspy/abliterator</a>, a TransformerLens-based library that wraps the
+                whole workflow. Its API map is exactly the procedure above:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>import abliterator
+
+model_path = "Qwen/Qwen3.8-27B"
+dataset = [
+    abliterator.get_harmful_instructions(),
+    abliterator.get_harmless_instructions(),
+]
+
+my_model = abliterator.ModelAbliterator(
+    model_path,
+    dataset,
+    device="cuda",
+    activation_layers=["resid_pre", "resid_post", "attn_out", "mlp_out"],
+    chat_template="&lt;system&gt;\n{instruction}&lt;end&gt;&lt;assistant&gt;",
+    positive_toks=positive_toks,
+    negative_toks=negative_toks,
+)
+
+my_model.cache_activations(N=512, reset=True, preserve_harmless=True)
+
+def find_best_refusal_dir(N=4, use_hooks=True, invert=False):
+    dirs = my_model.refusal_dirs(invert=invert)
+    scores = []
+    for direction in tqdm(dirs.items()):
+        score = my_model.test_dir(direction[1], N=N, use_hooks=use_hooks)[0]
+        scores.append((score, direction))
+    return sorted(scores, key=lambda x: x[0])
+
+my_amazing_dir = find_best_refusal_dir()[0]
+my_model.apply_refusal_dirs([my_amazing_dir], layers=None)</code></pre>
+                </div>
+              </div>
+
+              <p>Two details from that library matter. <code>preserve_harmless=True</code> keeps the harmless
+                behavior as ground truth so you can measure how much quality the ablation costs
+                (<code>mse_harmless</code> does exactly that). And practitioners blacklist early and late layers
+                because ablating them degrades general output.</p>
+
+              <h3 id="without-transformerlens">The weight-orthogonalization variant</h3>
+              <p>The huihui-ai abliterated Qwen3.8 releases use the hook-free variant, described in their
+                <code>remove-refusals-with-transformers</code> approach: instead of intercepting activations at
+                runtime, the refusal direction is <strong>written directly into the weight matrices</strong>. Their
+                model card lists exactly which tensors got modified, and the list doubles as a map of where refusal
+                lives in the Qwen3.8 hybrid architecture:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>token_embd     the embedding matrix
+output        the LM head
+ffn_down      feed-forward down-projections
+ssm_out       outputs of the linear-attention (delta) blocks
+attn_output   outputs of the gated attention blocks</code></pre>
+                </div>
+              </div>
+
+              <p>They also report what they deliberately left alone: <strong>the first 15 layers</strong> (same
+                blacklist advice as above), the MTP (multi-token prediction) draft heads, and the vision tower.
+                Result: a model that refuses almost nothing while still doing vision and reasoning.</p>
+
+              <h2 id="method-3-merging">Method 3: Merging and fusion</h2>
+              <p>The "Heretic" and "Fable Fusion" names come from model merging: taking several compatible models
+                and blending their weights with tools like mergekit, using algorithms like SLERP or linear
+                interpolation with per-layer ranges. A passthrough-style fusion can stack one model's reasoning
+                layers on another's uncensored writing layers:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>merge_method: passthrough
+base_model: Qwen/Qwen3.8-27B
+slices:
+  - sources:
+    - model: Qwen/Qwen3.8-27B
+      layer_range: [0, 16]          # early layers from the aligned base
+    - model: some-user/uncensored-blend
+      layer_range: [8, 24]          # middle from an uncensored derivative
+    - model: Qwen/Qwen3.8-27B
+      layer_range: [20, 64]         # tail back on the base
+dtype: bfloat16</code></pre>
+                </div>
+              </div>
+
+              <p>Merging is why the DavidAU "Fable Fusion" family exists at 3 million downloads: merges compound
+                traits like uncensored fiction writing with the base model's reasoning, producing composites no
+                single trainer trained. It also makes provenance messy, which matters in the defensive section
+                below.</p>
+
+              <h2 id="method-4-repacking">Method 4: Repacking for distribution</h2>
+              <p>None of this spreads without the packaging step. Quantization shrinks a 28B model from 54.7 GB
+                (BF16) down to about 11 GB (Q2_K), so it runs on a phone-class laptop via llama.cpp, Ollama or LM
+                Studio. The formats you keep seeing:</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Format</th>
+                    <th>Target</th>
+                    <th>Typical tool</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>GGUF (Q2_K to Q8_0)</td>
+                    <td>llama.cpp, Ollama, LM Studio</td>
+                    <td><code>llama-quantize</code></td>
+                  </tr>
+                  <tr>
+                    <td>FP8</td>
+                    <td>vLLM, SGLang servers</td>
+                    <td>LLM Compressor</td>
+                  </tr>
+                  <tr>
+                    <td>MLX</td>
+                    <td>Apple Silicon</td>
+                    <td>mlx-lm convert</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>Interesting wrinkle from the huihui-ai card: ablated models quantize worse on exactly the tensors
+                that were modified, so they re-quantize selectively, keeping the ablated tensors at higher precision
+                while the rest of the model goes down to Q4/Q6. Their published command runs
+                <code>llama-quantize</code> with a per-tensor type map:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>llama-quantize \
+  --allow-requantize \
+  --tensor-type-file huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/Qwen3.8-27B-tensor_types-Q6_K_L.txt \
+  huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/Huihui-Qwen3.8-27B-abliterated-bf16.gguf \
+  huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF/Huihui-Qwen3.8-27B-abliterated-Q6_K_L.gguf Q6_K</code></pre>
+                </div>
+              </div>
+
+              <h2 id="editing-model-settings">Editing model settings</h2>
+              <p>A second, softer layer of "uncensoring" is editing the settings files that ship in every repo. These
+                do not remove refusals, but they change how freely the model talks, which is why derivative cards
+                often pair them with ablation.</p>
+
+              <ul>
+                <li><code>generation_config.json</code>: sampling defaults. Higher temperature and presence penalty
+                  mean less repetitive, more "unfiltered-feeling" output. Qwen's own card recommends temperature 1.0,
+                  top_p 0.95, top_k 20 for thinking mode, and 0.7 / 0.8 with presence_penalty 1.5 for non-thinking
+                  mode. Unsuprisingly, unhinged presets get label names like "Aggressive".</li>
+                <li><code>tokenizer_config.json</code>: the chat template plus the system prompt. Stripping a
+                  restrictive system prompt out of the template removes a layer of steering per request.</li>
+                <li><code>config.json</code>: architecture flags like Qwen's <code>enable_thinking</code> and
+                  reasoning effort knobs, which change how much reasoning precedes an answer.</li>
+              </ul>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>{
+  "temperature": 0.7,
+  "top_p": 0.8,
+  "top_k": 20,
+  "min_p": 0.0,
+  "presence_penalty": 1.5,
+  "repetition_penalty": 1.0,
+  "do_sample": true,
+  "enable_thinking": false
+}</code></pre>
+                </div>
+              </div>
+
+              <p>One-line summary of the whole post: <strong>the refusals live in the weights, and the personality
+                  lives in the config files. Both are editable, which is the point of open weights.</strong></p>
+
+              <h2 id="why-this-happens-so-fast">Why this happens so fast</h2>
+              <ul>
+                <li><strong>Permissive licensing.</strong> Qwen3.8-27B is Apache-2.0. Redistribution and modification
+                  are explicitly allowed, so every derivative can legally be rehosted.</li>
+                <li><strong>The method is public and battleship-grade reliable.</strong> Abliteration is a paper, a
+                  library, dozens of forks, and a one-GPU afternoon. No secret sauce required.</li>
+                <li><strong>The distribution rail already exists.</strong> llama.cpp, Ollama and LM Studio auto-pull
+                  GGUF repos by name from Hugging Face, so publishing a quantized derivative is literally a git push
+                  away from millions of user machines.</li>
+                <li><strong>It compounds.</strong> Each uncensored model becomes a base for the next merge, which is
+                  how seven-suffix monsters like <code>Fable-Fusion-711-Uncensored-Heretic-NM-DAU-NEO-MAX-MTP</code>
+                  come to exist.</li>
+              </ul>
+
+              <h2 id="how-defenders-spot-it">How defenders spot it</h2>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Signal</th>
+                    <th>Where to look</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Name contains "Uncensored", "Abliterated", "Heretic", "Aggressive"</td>
+                    <td>repo name, tags, README headline</td>
+                  </tr>
+                  <tr>
+                    <td>Model card admits safety degradation with usage warnings</td>
+                    <td>huihui-style cards literally say "safety filtering has been significantly reduced"</td>
+                  </tr>
+                  <tr>
+                    <td>Not the official org</td>
+                    <td><code>Qwen/</code> vs third-party <code>*/Qwen3.8-*</code> prefixes</td>
+                  </tr>
+                  <tr>
+                    <td>High download counts with no eval results or provenance</td>
+                    <td>derivatives rarely carry benchmarks</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>Practical policy for teams: treat <strong>any non-official derivative as uncensored by
+                  default</strong>; pin models by exact revision and checksum; prefer first-party sources; and treat
+                downloaded weights as untrusted code in the load path, which ties into the supply-chain section of my
+                earlier post on <a href="/open-weights/">open-weight model risks</a>. The guardrail you are depending
+                on is a direction in a vector space. Someone is selling a version with that direction removed, and it
+                is three downloads away on the trending list.</p>
+
+              <h2 id="sources">Sources</h2>
+              <ul>
+                <li>Arditi, Obeso, Syed, et al., "Refusal in Language Models Is Mediated by a Single Direction",
+                  arXiv:2406.11717 (<a href="https://arxiv.org/abs/2406.11717" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+                <li>Failspy/abliterator on GitHub (<a href="https://github.com/FailSpy/abliterator" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+                <li>Qi et al., "Fine-tuning Aligned Language Models Compromises Safety, Even When Users Do Not Intend
+                  To!", arXiv:2310.03693 (<a href="https://arxiv.org/abs/2310.03693" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+                <li>Qwen/Qwen3.8-27B model card on Hugging Face (<a href="https://huggingface.co/Qwen/Qwen3.8-27B"
+                    target="_blank" rel="noopener noreferrer">link</a>)</li>
+                <li>huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF model card on Hugging Face (<a
+                    href="https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+              </ul>
+
+
+            </section>
+
+            <footer class="page__meta">
+
+
+              <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i>
+                  Updated:</strong>
+                <time datetime="2026-08-19T18:00:00+03:00">Aug 19, 2026</time>
+              </p>
+
+
+            </footer>
+
+
+
+            <nav class="pagination">
+
+              <a href="#" class="pagination--pager disabled" title="Previous
+">Previous</a>
+
+
+              <a href="/open-weights/" class="pagination--pager" title="Open Weights, Open Risk: The Security Implications of Open-Weight AI Models
+">Next</a>
+
+            </nav>
+
+          </div>
+
+
+        </article>
+
+
+
+      </div>
+    </div>
+
+
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+        <!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+          <ul class="social-icons">
+
+
+
+          </ul>
+        </div>
+        <div class="page__footer-copyright">&copy; 2026 9h4wk (James Maweu)</div>
+      </footer>
+    </div>
+
+
+    <script src="/assets/js/main.min.js"></script>
+
+
+  </body>
+
+  </html>
