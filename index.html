@@ -38,7 +38,6 @@
 
 
 
-  <link rel="next" href="https://9h4wk.github.io/page2/">
 
 
   <script type="application/ld+json">
@@ -61,6 +60,8 @@
 
   <!-- For all browsers -->
   <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23252a34'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2300adb5'%3E%3E_%3C/text%3E%3C/svg%3E">
   <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
@@ -186,204 +187,221 @@
 
       <div class="archive">
 
-        <h1 id="page-title" class="page__title"></h1>
-        <h3 class="archive__subtitle">Recent Posts</h3>
-        <div class="entries-list">
+        <h1 id="page-title" class="page__title visually-hidden">9h4wk's Blog</h1>
 
+        <section class="hero" aria-labelledby="hero-title">
+          <p class="hero__prompt">guest@9h4wk:~$ whoami</p>
+          <h2 id="hero-title" class="hero__title">Hi, I'm <span class="accent">James</span> &mdash; aka 9h4wk.</h2>
+          <p class="hero__typed" data-typed="Breaking things to see how they work.|Security write-ups &amp; malware teardowns.|AI, open weights &amp; the risks in between.|Documenting what I learn, building in public."></p>
+          <p class="hero__text">Technology, security &amp; AI. Notes, tools and write-ups from someone who takes things apart
+            to see how they work &mdash; and writes down what they learn.</p>
+          <div class="hero__actions">
+            <a class="btn--pill is-primary" href="#posts"><i class="fas fa-book-open" aria-hidden="true"></i> Read the blog</a>
+            <a class="btn--pill is-ghost" href="/about/"><i class="fas fa-user" aria-hidden="true"></i> About me</a>
+            <a class="btn--pill is-ghost" href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
+          </div>
+          <div class="hero__stats">
+            <div><strong>5</strong> posts</div>
+            <div><strong>7</strong> topics</div>
+            <div><strong>3+</strong> years writing</div>
+          </div>
+        </section>
 
-          <div class="list__item">
+        <div class="posts-toolbar" id="posts">
+          <h3 class="archive__subtitle">Recent Posts</h3>
+          <ul class="filter-chips" aria-label="Filter posts by topic">
+            <li><button type="button" class="chip is-active" data-tag="all" aria-pressed="true">all</button></li>
+            <li><button type="button" class="chip" data-tag="security" aria-pressed="false">security</button></li>
+            <li><button type="button" class="chip" data-tag="ai" aria-pressed="false">ai</button></li>
+            <li><button type="button" class="chip" data-tag="ctf" aria-pressed="false">ctf</button></li>
+            <li><button type="button" class="chip" data-tag="tools" aria-pressed="false">tools</button></li>
+            <li><button type="button" class="chip" data-tag="learning" aria-pressed="false">learning</button></li>
+          </ul>
+        </div>
+
+        <div class="entries-list" data-per-page="3">
+
+          <div class="list__item" data-tags="ai security">
             <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
 
               <h2 class="archive__item-title no_toc" itemprop="headline">
-
-                <a href="/abliteration/" rel="permalink">The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models
-                </a>
-
+                <a href="/abliteration/" rel="permalink">The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models</a><span class="new-badge">New</span>
               </h2>
-
 
               <p class="page__meta">
                 <span class="page__meta-date">
                   <i class="far fa-calendar-alt" aria-hidden="true"></i>
-
                   <time datetime="2026-08-19T18:00:00+03:00">Aug 19, 2026</time>
                 </span>
-
-
                 <span class="page__meta-sep"></span>
                 <span class="page__meta-readtime">
                   <i class="far fa-clock" aria-hidden="true"></i>
-
                   9 minute read
-
                 </span>
-
               </p>
-
 
               <p class="archive__item-excerpt" itemprop="description">
                 How open models like Qwen 3.8 lose their refusals: the abliteration method, the code, and the repacking
                 pipeline that turns one base release into hundreds of uncensored derivatives.
+              </p>
+
+              <ul class="post-tags" aria-label="Tags">
+                <li><a class="tag" href="/tags/#ai" data-tag="ai">#ai</a></li>
+                <li><a class="tag" href="/tags/#security" data-tag="security">#security</a></li>
+              </ul>
+
+              <span class="read-more" aria-hidden="true">Read article <i class="fas fa-arrow-right"></i></span>
             </article>
           </div>
 
-          <div class="list__item">
+          <div class="list__item" data-tags="ai security">
             <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
 
               <h2 class="archive__item-title no_toc" itemprop="headline">
-
-                <a href="/open-weights/" rel="permalink">Open Weights, Open Risk: The Security Implications of Open-Weight AI Models
-                </a>
-
+                <a href="/open-weights/" rel="permalink">Open Weights, Open Risk: The Security Implications of Open-Weight AI Models</a><span class="new-badge">New</span>
               </h2>
-
 
               <p class="page__meta">
                 <span class="page__meta-date">
                   <i class="far fa-calendar-alt" aria-hidden="true"></i>
-
                   <time datetime="2026-08-19T09:00:00+03:00">Aug 19, 2026</time>
                 </span>
-
-
                 <span class="page__meta-sep"></span>
                 <span class="page__meta-readtime">
                   <i class="far fa-clock" aria-hidden="true"></i>
-
                   8 minute read
-
                 </span>
-
               </p>
-
 
               <p class="archive__item-excerpt" itemprop="description">
                 Open-weight models power entire industries, but the same properties that make them useful also make
                 them risky: they cannot be recalled, their safeguards can be stripped, and they move through
                 supply chains nobody audits. Here is what the research actually says and what defenders can do about it.
+              </p>
+
+              <ul class="post-tags" aria-label="Tags">
+                <li><a class="tag" href="/tags/#ai" data-tag="ai">#ai</a></li>
+                <li><a class="tag" href="/tags/#security" data-tag="security">#security</a></li>
+              </ul>
+
+              <span class="read-more" aria-hidden="true">Read article <i class="fas fa-arrow-right"></i></span>
             </article>
           </div>
 
-          <div class="list__item">
+          <div class="list__item" data-tags="security phishing javascript">
             <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
 
               <h2 class="archive__item-title no_toc" itemprop="headline">
-
-                <a href="/phishing-kit/" rel="permalink">Deobfuscating a Phishing Kit: A Debugging Walkthrough
-                </a>
-
+                <a href="/phishing-kit/" rel="permalink">Deobfuscating a Phishing Kit: A Debugging Walkthrough</a>
               </h2>
-
 
               <p class="page__meta">
                 <span class="page__meta-date">
                   <i class="far fa-calendar-alt" aria-hidden="true"></i>
-
                   <time datetime="2024-05-12T12:00:00+03:00">May 12, 2024</time>
                 </span>
-
-
                 <span class="page__meta-sep"></span>
                 <span class="page__meta-readtime">
                   <i class="far fa-clock" aria-hidden="true"></i>
-
                   8 minute read
-
                 </span>
-
               </p>
-
 
               <p class="archive__item-excerpt" itemprop="description">
                 From a 700 KB one-liner to the exfil webhook: layer by layer debugging of a login-page phishing kit,
                 with the string array trick, eval hooks and the anti-debug trap defeated.
+              </p>
+
+              <ul class="post-tags" aria-label="Tags">
+                <li><a class="tag" href="/tags/#security" data-tag="security">#security</a></li>
+                <li><a class="tag" href="/tags/#phishing" data-tag="phishing">#phishing</a></li>
+                <li><a class="tag" href="/tags/#javascript" data-tag="javascript">#javascript</a></li>
+              </ul>
+
+              <span class="read-more" aria-hidden="true">Read article <i class="fas fa-arrow-right"></i></span>
             </article>
           </div>
 
-          <div class="list__item">
+          <div class="list__item" data-tags="security learning">
             <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
 
               <h2 class="archive__item-title no_toc" itemprop="headline">
-
-                <a href="/intro/" rel="permalink">Introduction to Cybersecurity for Beginners </a>
-
+                <a href="/intro/" rel="permalink">Introduction to Cybersecurity for Beginners</a>
               </h2>
-
 
               <p class="page__meta">
                 <span class="page__meta-date">
                   <i class="far fa-calendar-alt" aria-hidden="true"></i>
-
                   <time datetime="2023-02-20T03:00:00+02:00">Feb 20, 2023</time>
                 </span>
-
                 <span class="page__meta-sep"></span>
                 <span class="page__meta-readtime">
                   <i class="far fa-clock" aria-hidden="true"></i>
                   5 minute read
                 </span>
-
               </p>
 
-              <p class="archive__item-excerpt" itemprop="description">Welcome to the exciting world of cybersecurity!
+              <p class="archive__item-excerpt" itemprop="description">
+                Welcome to the exciting world of cybersecurity!
                 Whether you're a curious individual or a business owner looking to safeguard your data, this beginner's
                 guide will provide you with a comprehensive introduction to the field of cybersecurity.
+              </p>
+
+              <ul class="post-tags" aria-label="Tags">
+                <li><a class="tag" href="/tags/#security" data-tag="security">#security</a></li>
+                <li><a class="tag" href="/tags/#learning" data-tag="learning">#learning</a></li>
+              </ul>
+
+              <span class="read-more" aria-hidden="true">Read article <i class="fas fa-arrow-right"></i></span>
             </article>
           </div>
 
-          <div class="list__item">
+          <div class="list__item" data-tags="ctf tools">
             <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
 
               <h2 class="archive__item-title no_toc" itemprop="headline">
-
-                <a href="/stego/" rel="permalink">Steganography - A list of useful tools and resources
-                </a>
-
+                <a href="/stego/" rel="permalink">Steganography - A list of useful tools and resources</a>
               </h2>
-
 
               <p class="page__meta">
                 <span class="page__meta-date">
                   <i class="far fa-calendar-alt" aria-hidden="true"></i>
-
                   <time datetime="2023-02-20T03:00:00+02:00">Feb 20, 2023</time>
                 </span>
-
-
                 <span class="page__meta-sep"></span>
                 <span class="page__meta-readtime">
                   <i class="far fa-clock" aria-hidden="true"></i>
-
                   5 minute read
-
                 </span>
-
               </p>
-
 
               <p class="archive__item-excerpt" itemprop="description">
                 Steganography is hiding a file or a message inside of another file , there are many fun steganography
                 CTF challenges out there where the flag is hidden in an image , audio file or even other types of files.
                 Here is a list of the most tools ...
+              </p>
+
+              <ul class="post-tags" aria-label="Tags">
+                <li><a class="tag" href="/tags/#ctf" data-tag="ctf">#ctf</a></li>
+                <li><a class="tag" href="/tags/#tools" data-tag="tools">#tools</a></li>
+              </ul>
+
+              <span class="read-more" aria-hidden="true">Read article <i class="fas fa-arrow-right"></i></span>
             </article>
           </div>
 
-
         </div>
 
+        <p class="no-results" hidden>No posts under this topic yet &mdash; check back soon.</p>
 
-        <nav class="pagination">
-
+        <nav class="pagination" aria-label="Post pages">
           <ul>
-
-
             <li><a href="#" class="disabled"><span aria-hidden="true">Previous</span></a></li>
-
             <li><a href="#" class="disabled current">1</a></li>
             <li><a href="#" class="disabled">Next</a></li>
-
           </ul>
         </nav>
+        <p class="pagination__status" aria-live="polite"></p>
 
       </div>
     </div>
@@ -398,9 +416,10 @@
       <!-- end custom footer snippets -->
       <div class="page__footer-follow">
         <ul class="social-icons">
-
-
-
+          <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+          <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+          <li><a href="https://tryhackme.com/p/JayB1ack" rel="noopener noreferrer" target="_blank"><i class="fas fa-fw fa-flag" aria-hidden="true"></i> TryHackMe</a></li>
+          <li><a href="/about/"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> Contact</a></li>
         </ul>
       </div>
       <div class="page__footer-copyright">&copy; 2026 9h4wk (James Maweu)</div>
@@ -409,6 +428,7 @@
 
 
   <script src="/assets/js/main.min.js"></script>
+  <script src="/assets/js/custom.js" defer></script>
 
 
 
