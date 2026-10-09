@@ -1,0 +1,1024 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- begin _includes/seo.html -->
+  <title>Same Playbook, Two Ecosystems: Dissecting a Malicious npm Package and a Hijacked Browser Extension - 9h4wk's Blog</title>
+  <meta name="description"
+    content="A side-by-side teardown of a malicious npm package and a hijacked browser extension: how each got in, how it hid, what it took, and the detection signals that catch both.">
+
+  <!-- DRAFT: remove this line when publishing -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <meta name="author" content="9h4wk">
+  <meta property="article:author" content="9h4wk">
+
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="en">
+  <meta property="og:site_name" content="9h4wk's Blog">
+  <meta property="og:title" content="Same Playbook, Two Ecosystems">
+  <meta property="og:url" content="https://9h4wk.github.io/same-playbook/">
+  <meta property="og:description"
+    content="A side-by-side teardown of a malicious npm package and a hijacked browser extension, and the detection signals that catch both.">
+  <meta name="twitter:site" content="@9h4wk">
+  <meta name="twitter:title" content="Same Playbook, Two Ecosystems">
+  <meta name="twitter:description"
+    content="A side-by-side teardown of a malicious npm package and a hijacked browser extension, and the detection signals that catch both.">
+  <meta name="twitter:url" content="https://9h4wk.github.io/same-playbook/">
+  <meta name="twitter:card" content="summary">
+  <meta property="article:published_time" content="2026-10-05T12:00:00+03:00">
+
+  <link rel="canonical" href="https://9h4wk.github.io/same-playbook/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "9h4wk",
+    "url": "https://9h4wk.github.io/"
+  }
+  </script>
+  <!-- end _includes/seo.html -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  </script>
+
+  <!-- For all browsers -->
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/custom.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23252a34'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2300adb5'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  </noscript>
+</head>
+
+<body class="layout--single">
+  <nav class="skip-links">
+    <ul>
+      <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+      <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+      <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+    </ul>
+  </nav>
+
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <div class="masthead__menu">
+        <nav id="site-nav" class="greedy-nav">
+          <a class="site-title" href="/">9h4wk's Blog</a>
+          <ul class="visible-links">
+            <li class="masthead__menu-item"><a href="/about">About</a></li>
+            <li class="masthead__menu-item"><a href="/categories">Categories</a></li>
+            <li class="masthead__menu-item"><a href="/tags">Tags</a></li>
+          </ul>
+          <button class="greedy-nav__toggle hidden" type="button">
+            <span class="visually-hidden">Toggle menu</span>
+            <div class="navicon"></div>
+          </button>
+          <ul class="hidden-links hidden"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="initial-content">
+    <div id="main" role="main">
+
+      <div class="sidebar sticky">
+        <div itemscope itemtype="https://schema.org/Person">
+          <div class="author__avatar">
+            <img src="/images/avatar.jpg" alt="9h4wk" itemprop="image">
+          </div>
+          <div class="author__content">
+            <h3 class="author__name" itemprop="name">James Maweu</h3>
+            <div class="author__bio" itemprop="description">
+              Technology, security &amp; AI. Documenting what I learn, building in public.
+            </div>
+          </div>
+          <div class="author__urls-wrapper">
+            <button class="btn btn--inverse">Follow</button>
+            <ul class="author__urls social-icons">
+              <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+                <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Technology,
+                  security &amp; AI</span>
+              </li>
+              <li><a href="/" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-home"
+                    aria-hidden="true"></i><span class="label">Home Page</span></a></li>
+              <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                    class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+              <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i
+                    class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">Github</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+        <meta itemprop="headline" content="Same Playbook, Two Ecosystems: Dissecting a Malicious npm Package and a Hijacked Browser Extension">
+        <meta itemprop="datePublished" content="2026-10-05T12:00:00+03:00">
+
+        <div class="page__inner-wrap">
+
+          <header>
+            <h1 id="page-title" class="page__title p-name" itemprop="headline">
+              <a href="https://9h4wk.github.io/same-playbook/" class="u-url" itemprop="url">Same Playbook, Two
+                Ecosystems: Dissecting a Malicious npm Package and a Hijacked Browser Extension</a>
+            </h1>
+            <p class="page__meta">
+              <span class="page__meta-date">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                <time datetime="2026-10-05T12:00:00+03:00">Oct 5, 2026</time>
+              </span>
+              <span class="page__meta-sep"></span>
+              <span class="page__meta-readtime">
+                <i class="far fa-clock" aria-hidden="true"></i>
+                18 minute read
+              </span>
+            </p>
+          </header>
+
+          <section class="page__content e-content" itemprop="text">
+
+            <aside class="sidebar__right ">
+              <nav class="toc">
+                <header>
+                  <h4 class="nav__title"><i class="fas fa-file-alt"></i> Contents</h4>
+                </header>
+                <ul class="toc__menu">
+                  <li>
+                    <a href="#introduction">Introduction</a>
+                    <ul>
+                      <li><a href="#tldr">TL;DR</a></li>
+                      <li><a href="#the-samples">The two samples</a></li>
+                      <li><a href="#lab-setup">Lab setup and safe handling</a>
+                        <ul>
+                          <li><a href="#lab-network">Isolating the network</a></li>
+                          <li><a href="#lab-sourcing">Getting the samples</a></li>
+                          <li><a href="#lab-intake">Case intake</a></li>
+                          <li><a href="#lab-rules">Handling rules</a></li>
+                        </ul>
+                      </li>
+                      <li><a href="#teardown-npm">Teardown A: the npm package</a></li>
+                      <li><a href="#teardown-extension">Teardown B: the browser extension</a></li>
+                      <li><a href="#side-by-side">Side by side: one playbook</a></li>
+                      <li><a href="#detection-signals">Detection signals that catch both</a></li>
+                      <li><a href="#tooling">Building a version-diff checker</a></li>
+                      <li><a href="#defender-playbook">Defender playbook</a></li>
+                      <li><a href="#iocs">Indicators of compromise</a></li>
+                      <li><a href="#takeaways">Takeaways</a></li>
+                      <li><a href="#sources">Sources</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </nav>
+            </aside>
+
+            <div class="draft-note">
+              <strong>DRAFT SCAFFOLD.</strong> Every box like this one is a writing prompt for you; delete it once the
+              section is written. Dashed boxes are screenshot slots. Before publishing: defang every URL/IP
+              (<code>hxxps://evil[.]example</code>), redact any personal data found in the samples, and remove the
+              <code>noindex</code> meta tag in the page head.
+            </div>
+
+            <!-- ===================================================================== -->
+            <h2 id="introduction">Introduction</h2>
+
+            <p>On <strong>22 October 2021</strong>, three new versions of <code>ua-parser-js</code> appeared on npm. The
+              library parses User-Agent strings, it was pulling in close to <strong>8 million downloads a week</strong>,
+              and over a thousand other packages depended on it. For roughly four hours, anyone who installed it got a
+              cryptominer, and on Windows a credential stealer as well. The maintainer had not written a line of it:
+              someone had taken over his npm account.</p>
+
+            <p>On <strong>Christmas Eve 2024</strong>, an employee at the data-security company Cyberhaven approved what
+              looked like a routine Chrome Web Store policy request. A few hours later, version <code>24.10.4</code> of
+              the Cyberhaven browser extension, installed on around <strong>400,000</strong> corporate machines, started
+              rolling out through Chrome's auto-update. It was quietly collecting session cookies and access tokens
+              for business accounts. Again, the publisher had not written it: the attacker had been granted publishing
+              rights through a malicious OAuth app.</p>
+
+            <p>Different ecosystems, different payloads, three years apart. Yet look past the details and the moves are
+              almost identical: <strong>take over a trusted publisher, ship through the official update channel, run
+              automatically with the user's privileges, steal what lets you come back later, and be gone before
+              anyone reads the diff.</strong></p>
+
+            <p>This post tears both incidents apart side by side: how the attacker got in, where the code ran, how
+              it hid, what it took, and the detection signals that would have caught <em>both</em>. It ends with a
+              small, open-source checker you can drop into CI or an extension-review process.</p>
+
+            <div class="notice--info">
+              <p><strong>Scope and safety.</strong> Everything here is based on public advisories and published
+                samples of incidents that were contained years or months ago. Indicators are defanged
+                (<code>hxxps://</code>, <code>[.]</code>), code excerpts are trimmed to what is needed to understand
+                the technique, and all analysis was done offline in an isolated lab.</p>
+            </div>
+
+            <h3 id="tldr">TL;DR</h3>
+            <ul>
+              <li><strong>npm (ua-parser-js, 2021):</strong> hijacked maintainer account &rarr; three malicious
+                versions whose script ran automatically at install time &rarr; XMRig cryptominer on Linux and Windows, plus a
+                credential stealer on Windows &rarr; live for about 4 hours.</li>
+              <li><strong>Extension (Cyberhaven, 2024):</strong> phished developer approves a fake "Privacy Policy
+                Extensions" OAuth app &rarr; malicious update published to the Chrome Web Store &rarr; auto-update
+                pushes it to users &rarr; cookies and tokens for targeted services (notably Facebook Business accounts)
+                sent to <code>cyberhavenext[.]pro</code> &rarr; live for about a day.</li>
+              <li><strong>Shared playbook:</strong> publisher takeover, official distribution, automatic execution,
+                credential and session theft, a short dwell time.</li>
+              <li><strong>One control that would have blunted both:</strong> treat <em>updates</em> as untrusted code.
+                Pin and review dependency versions, and allowlist extensions so a new version cannot quietly gain
+                new reach.</li>
+            </ul>
+
+            <!-- ===================================================================== -->
+            <h2 id="the-samples">The two samples</h2>
+
+            <p>I picked these two because they rhyme: in both, the code came from the <em>real</em> publisher account,
+              through the <em>real</em> distribution channel, signed and served by the platform itself. Nothing about
+              the package name or extension ID looked off; there was no typosquat to spot. That is what makes
+              publisher-takeover attacks harder to catch than impersonation.</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Sample A &mdash; npm</th>
+                    <th>Sample B &mdash; Chrome extension</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Name / ID</td><td><code>ua-parser-js</code></td><td>Cyberhaven<br><code>pajkjnmeojmbapicmbpliphjmcekeaac</code></td></tr>
+                  <tr><td>What it does normally</td><td>Parses User-Agent strings (browser, OS, device)</td><td>Enterprise data-loss-prevention extension</td></tr>
+                  <tr><td>Reach</td><td>~8M weekly downloads, 1,200+ dependents</td><td>~400,000 corporate users</td></tr>
+                  <tr><td>Last clean version</td><td><code>0.7.28</code> (10 Apr 2021); <code>0.8.0</code> and <code>1.0.0</code> were brand-new version lines</td><td><code>24.10.x</code> before 24.10.4 [verify]</td></tr>
+                  <tr><td>Malicious version(s)</td><td><code>0.7.29</code>, <code>0.8.0</code>, <code>1.0.0</code></td><td><code>24.10.4</code></td></tr>
+                  <tr><td>Fixed version(s)</td><td><code>0.7.30</code>, <code>0.8.1</code>, <code>1.0.1</code></td><td><code>24.10.5</code></td></tr>
+                  <tr><td>Initial access</td><td>Maintainer's npm account hijacked</td><td>Developer phished into authorising a malicious OAuth app with Chrome Web Store publish rights</td></tr>
+                  <tr><td>Live window</td><td>22 Oct 2021, ~12:15 to ~16:20 GMT (about 4 hours)</td><td>Malicious update published 24 Dec 2024; exfil domain active 01:32 UTC 25 Dec to 02:50 UTC 26 Dec</td></tr>
+                  <tr><td>Who caught it</td><td>Users on GitHub (issue #536), confirmed by the maintainer</td><td>Cyberhaven's own security team, 23:54 UTC 25 Dec</td></tr>
+                  <tr><td>Advisory</td><td>GHSA-pjwm-rvh2-c87w / CVE-2021-4229; CISA alert</td><td>Cyberhaven incident notice; Sekoia, Obsidian, Darktrace write-ups</td></tr>
+                  <tr><td>SHA-256 of sample</td><td><code>[fill in after intake]</code></td><td><code>[fill in after intake]</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="draft-note">
+              Cross-check every row against at least two of the sources at the bottom before publishing, especially
+              the "last clean version" row. Add the hashes after you run the intake script below.
+            </div>
+
+            <p>Neither attack was a one-off. Within two weeks of ua-parser-js, the popular npm packages <code>coa</code> and
+              <code>rc</code> were hijacked the same way, and the Cyberhaven compromise turned out to be one of a cluster of Chrome
+              extensions hit by the same phishing campaign in December 2024. Researchers tied the campaign to lookalike
+              "Chrome Web Store" sender domains, a fake OAuth app called <em>Privacy Policy Extensions</em>, and
+              dedicated exfiltration domains for each compromised extension.</p>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 1</span>
+              Timeline: the npm version history around 22 Oct 2021 next to the Cyberhaven timeline (24&ndash;26 Dec
+              2024). A simple two-lane diagram you draw works best.
+              <!-- Replace this whole <figure> with:
+              <figure>
+                <img src="/images/same-playbook/01-timeline.png" alt="Timeline of both incidents">
+                <figcaption>Figure 1: Both incidents, from takeover to clean-up.</figcaption>
+              </figure> -->
+            </figure>
+
+            <!-- ===================================================================== -->
+            <h2 id="lab-setup">Lab setup and safe handling</h2>
+
+            <p>Both samples steal credentials, so the ground rule is simple: <strong>nothing in the lab should be worth
+              stealing, and nothing should be able to leave.</strong> My setup:</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Component</th><th>Choice</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Hypervisor</td><td>[VirtualBox / VMware / Proxmox]</td><td>Snapshots and an isolated virtual network</td></tr>
+                  <tr><td>Analysis VM</td><td>[e.g. Ubuntu 24.04, REMnux]</td><td>Static analysis tooling; no personal accounts</td></tr>
+                  <tr><td>Network</td><td>Host-only network + a sinkhole VM</td><td>All DNS resolves to the sinkhole, so callbacks are logged, not delivered</td></tr>
+                  <tr><td>Tooling</td><td>Node.js, jq, js-beautify, diff/diffstat, tcpdump, CyberChef</td><td>Read and diff; never execute unless deliberately in the detonation snapshot</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="draft-note">
+              Fill in your real setup and versions. Add a screenshot of the VM's network settings showing host-only
+              networking, so readers can see there is no NAT or bridged adapter.
+            </div>
+
+            <h3 id="lab-network">Isolating the network</h3>
+
+            <p>The sinkhole VM answers every DNS query with its own address and records what was asked. That turns any
+              attempted call home into a log line you can screenshot. With <code>dnsmasq</code>:</p>
+
+            <div class="language-ini highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># /etc/dnsmasq.d/sinkhole.conf  (on the sinkhole VM, 10.13.37.1)
+interface=enp0s8          # the host-only adapter
+no-resolv                 # never forward queries to a real upstream
+address=/#/10.13.37.1     # every domain resolves to the sinkhole
+log-queries
+log-facility=/var/log/sinkhole-dns.log</code></pre>
+              </div>
+            </div>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># on the analysis VM: point DNS at the sinkhole and drop everything else outbound
+sudo resolvectl dns enp0s8 10.13.37.1
+sudo iptables -P OUTPUT DROP
+sudo iptables -A OUTPUT -o lo -j ACCEPT
+sudo iptables -A OUTPUT -d 10.13.37.1 -j ACCEPT
+
+# capture whatever the sample tries, for the write-up
+sudo tcpdump -i enp0s8 -w ~/cases/capture-$(date +%F).pcap</code></pre>
+              </div>
+            </div>
+
+            <p>Before every risky step, take a snapshot so you can roll back to a known-clean state:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>VBoxManage snapshot "analysis-vm" take "pre-intake-$(date +%F-%H%M)" --live
+VBoxManage snapshot "analysis-vm" list
+# after the session
+VBoxManage snapshot "analysis-vm" restore "pre-intake-..."</code></pre>
+              </div>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 2</span>
+              VM network settings (host-only only) and the snapshot list.
+            </figure>
+
+            <h3 id="lab-sourcing">Getting the samples</h3>
+
+            <p>Both malicious versions were pulled from their registries long ago, so you cannot (and should not)
+              fetch them from npm or the Chrome Web Store. There are three safe sources:</p>
+            <ol>
+              <li><strong>Public malware repositories and research datasets</strong>, such as MalwareBazaar or
+                Datadog's open malicious-packages dataset. Samples are distributed as password-protected archives, and
+                you verify them against the SHA-256 published in advisories.</li>
+              <li><strong>Published diffs and excerpts</strong> in the original GitHub issue, vendor write-ups and
+                incident reports. If you can't get a binary sample, analysing the published diff is still legitimate,
+                as long as you say so.</li>
+              <li><strong>Clean baselines from the official channel.</strong> The fixed and earlier versions are still
+                available, and they are what you diff against.</li>
+            </ol>
+
+            <div class="draft-note">
+              Name the exact source you used for each sample and its SHA-256, so readers can reproduce your work. If a
+              source requires an account or approval, say so.
+            </div>
+
+            <p>Start with the registry metadata. npm removes malicious tarballs, but it keeps the publish
+              timestamps, and in a takeover the timeline alone tells a story:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>npm view ua-parser-js time --json   | jq 'with_entries(select(.key | IN("0.7.28","0.7.29","0.7.30","0.8.0","0.8.1","1.0.0","1.0.1","1.0.2")))'</code></pre>
+              </div>
+            </div>
+
+            <div class="language-json highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>{
+  "0.7.28": "2021-04-10T14:42:47.159Z",
+  "0.7.29": "2021-10-22T12:15:21.378Z",
+  "0.8.0":  "2021-10-22T12:16:06.877Z",
+  "1.0.0":  "2021-10-22T12:16:19.726Z",
+  "0.7.30": "2021-10-22T16:16:08.807Z",
+  "0.8.1":  "2021-10-22T16:23:53.062Z",
+  "1.0.1":  "2021-10-22T16:26:19.004Z",
+  "1.0.2":  "2021-10-27T10:24:04.532Z"
+}</code></pre>
+              </div>
+            </div>
+
+            <p>Read it carefully and three things jump out:</p>
+            <ol>
+              <li><strong>Six months of silence, then three releases in 58 seconds.</strong> Nobody hand-publishes
+                three version lines in under a minute. That is a script.</li>
+              <li><strong>The attacker covered every way of upgrading.</strong> <code>0.7.29</code> was a patch bump,
+                so anyone on <code>^0.7.x</code> got it automatically. <code>0.8.0</code> and <code>1.0.0</code> had
+                no earlier releases at all: they were new version lines, so a fresh <code>npm install
+                ua-parser-js</code> (which takes <code>latest</code>) also got malware.</li>
+              <li><strong>The fixes landed about four hours later</strong> (16:16&ndash;16:26 UTC). That gap is the
+                exposure window.</li>
+            </ol>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 3</span>
+              Your terminal running the timeline query, or the npm "Versions" tab for ua-parser-js.
+            </figure>
+
+            <p>Next, the clean baselines, downloaded as tarballs with nothing executed. These are the release before
+              the attack and the fix after it:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>mkdir -p baselines
+for v in 0.7.28 0.7.30; do
+  npm pack "ua-parser-js@$v" --ignore-scripts --pack-destination ./baselines
+done
+ls baselines/
+# ua-parser-js-0.7.28.tgz  ua-parser-js-0.7.30.tgz</code></pre>
+              </div>
+            </div>
+
+            <p>A clean copy of the extension, straight from Google's update service (this returns whatever version is
+              live now, which will be a fixed release):</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>EXT_ID=pajkjnmeojmbapicmbpliphjmcekeaac
+curl -sSL -o baselines/cyberhaven-current.crx \
+  "https://clients2.google.com/service/update2/crx?response=redirect&amp;prodversion=130.0&amp;acceptformat=crx2,crx3&amp;x=id%3D${EXT_ID}%26uc"
+file baselines/cyberhaven-current.crx    # expect: Google Chrome extension, version 3</code></pre>
+              </div>
+            </div>
+
+            <div class="draft-note">
+              Run these on the host <em>before</em> you isolate the VM (they are clean files), then copy them in.
+            </div>
+
+            <h3 id="lab-intake">Case intake: hash, unpack, record</h3>
+
+            <p>Every sample goes through the same intake script. It hashes the original file, unpacks a working copy
+              (npm tarball or CRX), defangs nothing (that's done by hand in the write-up), and writes a small JSON
+              record. Nothing in the sample is executed.</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>#!/usr/bin/env bash
+# intake.sh - usage: ./intake.sh &lt;case-name&gt; &lt;sample-file&gt;
+set -euo pipefail
+
+CASE="$1"; SAMPLE="$2"
+DIR="$HOME/cases/$CASE"
+mkdir -p "$DIR"/{original,unpacked,notes}
+
+cp --no-clobber "$SAMPLE" "$DIR/original/"
+chmod a-x "$DIR/original/"*                 # samples are data, never executables
+SHA256=$(sha256sum "$SAMPLE" | cut -d' ' -f1)
+
+case "$SAMPLE" in
+  *.tgz)
+    tar -xzf "$SAMPLE" -C "$DIR/unpacked"
+    META="$DIR/unpacked/package/package.json"
+    NAME=$(jq -r .name "$META"); VERSION=$(jq -r .version "$META")
+    HOOKS=$(jq -c '.scripts // {} | with_entries(select(.key | test("install|prepare")))' "$META")
+    ;;
+  *.crx|*.zip)
+    unzip -qo "$SAMPLE" -d "$DIR/unpacked" || true   # CRX header triggers a harmless warning
+    META="$DIR/unpacked/manifest.json"
+    NAME=$(jq -r .name "$META"); VERSION=$(jq -r .version "$META")
+    HOOKS=$(jq -c '{permissions, host_permissions, background}' "$META")
+    ;;
+  *) echo "unknown sample type: $SAMPLE" &gt;&amp;2; exit 1 ;;
+esac
+
+# file inventory with per-file hashes, for diffing later
+( cd "$DIR/unpacked" &amp;&amp; find . -type f -print0 | sort -z | xargs -0 sha256sum ) &gt; "$DIR/notes/files.sha256"
+
+jq -n --arg case "$CASE" --arg file "$(basename "$SAMPLE")" --arg sha256 "$SHA256" \
+      --arg name "$NAME" --arg version "$VERSION" --argjson exec "$HOOKS" \
+      --arg date "$(date -u +%FT%TZ)" \
+      '{case:$case, file:$file, sha256:$sha256, name:$name, version:$version, execution_surface:$exec, intake_utc:$date}' \
+  | tee "$DIR/notes/intake.json"</code></pre>
+              </div>
+            </div>
+
+            <p>Running it against a clean baseline looks like this, and it's exactly what you'll later compare with the
+              malicious version:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>$ ./intake.sh ua-parser-0.7.28 baselines/ua-parser-js-0.7.28.tgz
+{
+  "case": "ua-parser-0.7.28",
+  "file": "ua-parser-js-0.7.28.tgz",
+  "sha256": "416a7af001e40ea2430136873c638c8afe655a1485b62b3b9e0d7ed49535e46b",
+  "name": "ua-parser-js",
+  "version": "0.7.28",
+  "execution_surface": {},
+  "intake_utc": "2026-10-05T12:01:07Z"
+}</code></pre>
+              </div>
+            </div>
+
+            <div class="draft-note">
+              Run it on all four inputs (two clean, two malicious) and show the results. The
+              <code>execution_surface</code> field is the first "aha": empty for the clean npm version, and not empty
+              for the malicious one. Screenshot the two side by side.
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 4</span>
+              Intake output for the clean vs. malicious npm version, showing the <code>execution_surface</code>
+              difference.
+            </figure>
+
+            <h3 id="lab-rules">Handling rules I followed</h3>
+            <ul>
+              <li>Samples stay in password-protected archives at rest, and are unpacked only inside the VM.</li>
+              <li>No <code>npm install</code>, <code>node</code> or browser load of a malicious sample outside a
+                dedicated, disposable detonation snapshot. All static analysis is read-only.</li>
+              <li>Every URL, domain and IP is defanged in notes and in this post.</li>
+              <li>Any personal data found in a sample or capture is redacted before screenshots.</li>
+              <li>The VM is reverted to the clean snapshot after each session.</li>
+            </ul>
+
+            <!-- ===================================================================== -->
+            <h2 id="teardown-npm">Teardown A: the npm package</h2>
+
+            <h3 id="npm-entry">How it got in</h3>
+            <div class="draft-note">
+              Typosquat, hijacked maintainer account, or a dependency added in a minor release? Show the evidence:
+              publish time vs. previous releases, maintainer change, name similarity. Use the
+              <code>npm view ... time maintainers</code> output.
+            </div>
+            <p>[Your analysis]</p>
+
+            <h3 id="npm-trigger">Where it executes</h3>
+            <p>The first thing to check in any suspicious package is whether it runs code at install time or only
+              when imported:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># lifecycle hooks run automatically on install unless scripts are disabled
+jq '.scripts | {preinstall, install, postinstall, prepare}' pkg-&lt;version&gt;/package/package.json
+
+# what does the package expose when required?
+jq '{main, exports, bin}' pkg-&lt;version&gt;/package/package.json</code></pre>
+              </div>
+            </div>
+
+            <div class="draft-note">
+              Paste the relevant <code>package.json</code> excerpt from the <em>malicious</em> version and the clean
+              one next to it. Explain why install-time execution matters (CI runners and developer laptops hold
+              tokens).
+            </div>
+
+            <div class="language-json highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>// [paste package.json "scripts" excerpt from the malicious version here]</code></pre>
+              </div>
+            </div>
+
+            <h3 id="npm-diff">Diffing clean vs. malicious</h3>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># beautify both trees first so the diff is readable
+npx js-beautify -r pkg-clean/package/**/*.js pkg-bad/package/**/*.js
+
+diff -ruN pkg-clean/package pkg-bad/package &gt; npm.diff
+diffstat npm.diff        # which files changed and by how much</code></pre>
+              </div>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 5</span>
+              The diff in your editor, highlighting the injected file or block.
+            </figure>
+
+            <h3 id="npm-deobfuscation">Peeling the obfuscation</h3>
+            <div class="draft-note">
+              Walk the layers the way you did in the <a href="/phishing-kit/">phishing-kit post</a>: encoding first,
+              then string arrays / dynamic property access, then control flow. Show short <strong>defanged</strong>
+              before/after excerpts from the public sample, not the whole payload. Name any obfuscator you identify.
+            </div>
+
+            <div class="language-javascript highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>// Layer 1 (as shipped) - [paste a short defanged excerpt]</code></pre>
+              </div>
+            </div>
+            <div class="language-javascript highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>// Layer 1 (decoded) - [paste your cleaned-up version with comments]</code></pre>
+              </div>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 6</span>
+              CyberChef recipe or debugger paused on the decode routine.
+            </figure>
+
+            <h3 id="npm-objective">What it was after and where data went</h3>
+            <div class="draft-note">
+              Environment variables? Specific wallets or apps? Only on certain platforms or only in CI? Describe the
+              target selection and the exfiltration channel at the indicator level (domain, protocol, encoding),
+              all defanged. Compare with what the vendor write-up says and note anything you found that they
+              didn't, or vice versa.
+            </div>
+            <p>[Your analysis]</p>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 7</span>
+              Packet capture / sinkhole log showing the attempted outbound request (defang the host).
+            </figure>
+
+            <!-- ===================================================================== -->
+            <h2 id="teardown-extension">Teardown B: the browser extension</h2>
+
+            <h3 id="ext-entry">How the trust was abused</h3>
+            <div class="draft-note">
+              Ownership sale, phished developer account, or compromised build pipeline? Show the store listing
+              history, the update that introduced the change, and how fast it rolled out via auto-update.
+            </div>
+            <p>[Your analysis]</p>
+
+            <h3 id="ext-permissions">Manifest and permission changes</h3>
+            <p>Comparing the manifest across versions is the fastest triage step:</p>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>diff &lt;(jq -S . ext-clean/manifest.json) &lt;(jq -S . ext-bad/manifest.json)</code></pre>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Field</th><th>Clean</th><th>Malicious</th><th>Why it matters</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>permissions</code></td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td><code>host_permissions</code></td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td><code>content_scripts.matches</code></td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td><code>background.service_worker</code></td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 8</span>
+              The manifest diff, or the store "permissions" prompt before vs. after.
+            </figure>
+
+            <h3 id="ext-injected-code">Finding the injected code</h3>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>npx js-beautify -r ext-clean/**/*.js ext-bad/**/*.js
+diff -ruN ext-clean ext-bad &gt; ext.diff
+
+# quick triage for network and dynamic-code primitives in the new version
+grep -rnE "fetch\(|XMLHttpRequest|WebSocket|sendBeacon|chrome\.(cookies|webRequest|scripting)|atob\(|Function\(" ext-bad \
+  | grep -v node_modules</code></pre>
+              </div>
+            </div>
+
+            <div class="draft-note">
+              Explain which context the injected code runs in (service worker vs. content script), what triggers
+              it (install, browser start, visiting specific sites), and how it talks to its server. Use short
+              defanged excerpts only.
+            </div>
+
+            <div class="language-javascript highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>// [paste short defanged excerpt of the injected logic, with your comments]</code></pre>
+              </div>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 9</span>
+              DevTools on the extension's service worker (lab VM only), or the diff hunk with the injected code.
+            </figure>
+
+            <h3 id="ext-objective">What it was after and where data went</h3>
+            <p>[Your analysis]</p>
+
+            <!-- ===================================================================== -->
+            <h2 id="side-by-side">Side by side: one playbook</h2>
+
+            <div class="draft-note">
+              This is the heart of the post. Fill the table, then write 2&ndash;3 paragraphs on the
+              <em>pattern</em>: what attackers exploit is the update channel and the trust users already gave.
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Stage</th><th>npm package</th><th>Browser extension</th><th>Shared idea</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Initial access</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Delivery</td><td>[...]</td><td>[...]</td><td>Silent update / install</td></tr>
+                  <tr><td>Trigger</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Obfuscation</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Targeting</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Exfiltration</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Time to detection</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                  <tr><td>Who caught it</td><td>[...]</td><td>[...]</td><td>[...]</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 10</span>
+              Optional diagram: both kill chains drawn as parallel lanes.
+            </figure>
+
+            <!-- ===================================================================== -->
+            <h2 id="detection-signals">Detection signals that catch both</h2>
+
+            <ol>
+              <li><strong>Ownership change, then a release.</strong> A new maintainer or publisher followed shortly
+                by a new version.</li>
+              <li><strong>New execution surface in a minor/patch release.</strong> New install hooks in
+                <code>package.json</code>; new permissions, host patterns or content-script matches in
+                <code>manifest.json</code>.</li>
+              <li><strong>Readable code becomes obfuscated.</strong> High-entropy strings, huge single-line files,
+                or <code>eval</code>/<code>Function</code> appearing where they never existed.</li>
+              <li><strong>New outbound destinations.</strong> Domains in the code that no previous version
+                contacted.</li>
+              <li><strong>Diff size that doesn't match the changelog.</strong> "Bug fixes" shipping thousands of
+                new lines.</li>
+            </ol>
+
+            <div class="draft-note">
+              For each signal, say whether it fired for sample A, sample B, or both, and how early it would have
+              caught them.
+            </div>
+
+            <!-- ===================================================================== -->
+            <h2 id="tooling">Building a version-diff checker</h2>
+
+            <p>The signals above are mechanical enough to automate. This small Node script compares two unpacked
+              versions (npm package or extension) and flags them. It only reads files; it never executes the
+              sample.</p>
+
+            <div class="language-javascript highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>// version-diff-check.js - usage: node version-diff-check.js &lt;old-dir&gt; &lt;new-dir&gt;
+const fs = require("fs");
+const path = require("path");
+
+const [oldDir, newDir] = process.argv.slice(2);
+const findings = [];
+const flag = (signal, detail) =&gt; findings.push({ signal, detail });
+
+const readJson = (dir, file) =&gt; {
+  const p = path.join(dir, file);
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : null;
+};
+
+function jsFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =&gt; {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) return e.name === "node_modules" ? [] : jsFiles(p);
+    return /\.(c|m)?js$/.test(e.name) ? [p] : [];
+  });
+}
+
+// Shannon entropy of a string, in bits per character
+function entropy(s) {
+  const counts = {};
+  for (const c of s) counts[c] = (counts[c] || 0) + 1;
+  return Object.values(counts).reduce((h, n) =&gt; h - (n / s.length) * Math.log2(n / s.length), 0);
+}
+
+// 1. npm: new lifecycle hooks
+const HOOKS = ["preinstall", "install", "postinstall", "prepare"];
+const oldPkg = readJson(oldDir, "package.json");
+const newPkg = readJson(newDir, "package.json");
+if (newPkg) {
+  for (const h of HOOKS) {
+    const before = oldPkg?.scripts?.[h];
+    const after = newPkg.scripts?.[h];
+    if (after &amp;&amp; after !== before) flag("new-install-hook", `${h}: ${after}`);
+  }
+}
+
+// 2. extension: new permissions / host access / content script matches
+const oldMan = readJson(oldDir, "manifest.json");
+const newMan = readJson(newDir, "manifest.json");
+if (newMan) {
+  const list = (m, key) =&gt; new Set((m?.[key] || []).flat());
+  const matches = (m) =&gt; new Set((m?.content_scripts || []).flatMap((c) =&gt; c.matches || []));
+  for (const key of ["permissions", "host_permissions", "optional_permissions"]) {
+    const before = list(oldMan, key);
+    for (const p of list(newMan, key)) if (!before.has(p)) flag("new-permission", `${key}: ${p}`);
+  }
+  const before = matches(oldMan);
+  for (const m of matches(newMan)) if (!before.has(m)) flag("new-content-script-match", m);
+}
+
+// 3 + 4. obfuscation markers and new URLs, per file
+const urlRe = /https?:\/\/[^\s"'`)]+/g;
+const oldUrls = new Set(jsFiles(oldDir).flatMap((f) =&gt; fs.readFileSync(f, "utf8").match(urlRe) || []));
+
+for (const file of jsFiles(newDir)) {
+  const src = fs.readFileSync(file, "utf8");
+  const rel = path.relative(newDir, file);
+  const longest = Math.max(...src.split("\n").map((l) =&gt; l.length));
+  if (longest &gt; 5000) flag("very-long-line", `${rel} (${longest} chars)`);
+  for (const lit of src.match(/(["'`])[A-Za-z0-9+/=]{200,}\1/g) || []) {
+    if (entropy(lit) &gt; 5.2) flag("high-entropy-string", `${rel} (${lit.length} chars)`);
+  }
+  if (/\beval\s*\(|new\s+Function\s*\(/.test(src)) flag("dynamic-code", rel);
+  for (const u of src.match(urlRe) || []) if (!oldUrls.has(u)) flag("new-url", `${rel}: ${u}`);
+}
+
+// 5. diff size vs. old size
+const size = (d) =&gt; jsFiles(d).reduce((n, f) =&gt; n + fs.statSync(f).size, 0);
+const growth = size(newDir) / Math.max(1, size(oldDir));
+if (growth &gt; 1.5) flag("large-growth", `JS size grew ${growth.toFixed(1)}x`);
+
+console.table(findings);
+process.exitCode = findings.length ? 1 : 0;</code></pre>
+              </div>
+            </div>
+
+            <div class="draft-note">
+              Run it against both sample pairs and paste the output. Tune the thresholds (line length, entropy,
+              growth) based on what you see and explain your choices. Run it on a few benign updates of popular
+              packages too and report false positives &mdash; that honesty makes the post stronger. Push the
+              script to your GitHub and link it here.
+            </div>
+
+            <figure class="shot-slot">
+              <span class="shot-slot__label"><i class="far fa-image" aria-hidden="true"></i> Screenshot 11</span>
+              Terminal output of the checker on sample A and sample B.
+            </figure>
+
+            <!-- ===================================================================== -->
+            <h2 id="defender-playbook">Defender playbook</h2>
+
+            <h3 id="defend-npm">npm</h3>
+
+            <div class="language-ini highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># .npmrc - don't run third-party lifecycle scripts by default
+ignore-scripts=true
+# pin exact versions so updates only arrive through a reviewed lockfile change
+save-exact=true</code></pre>
+              </div>
+            </div>
+
+            <div class="language-bash highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code># CI: reproducible install from the lockfile, no scripts
+npm ci --ignore-scripts
+
+# verify registry signatures and provenance attestations
+npm audit signatures
+
+# known-vulnerable / known-malicious lookups
+npx osv-scanner --lockfile=package-lock.json</code></pre>
+              </div>
+            </div>
+
+            <ul>
+              <li>Commit lockfiles and review lockfile diffs in PRs like code.</li>
+              <li>Route installs through a private registry or proxy that can block new or flagged versions.</li>
+              <li>Keep long-lived tokens out of CI jobs that install dependencies.</li>
+              <li>[Add anything specific your sample would have been stopped by]</li>
+            </ul>
+
+            <h3 id="defend-extensions">Browser extensions</h3>
+
+            <p>On managed machines, block everything and allow by ID. Chrome policy example
+              (<code>/etc/opt/chrome/policies/managed/extensions.json</code> on Linux; the same keys via GPO/Intune
+              on Windows):</p>
+
+            <div class="language-json highlighter-rouge">
+              <div class="highlight">
+                <pre class="highlight"><code>{
+  "ExtensionSettings": {
+    "*": {
+      "installation_mode": "blocked",
+      "blocked_permissions": ["debugger", "proxy", "webRequestBlocking"]
+    },
+    "&lt;allowed-extension-id&gt;": {
+      "installation_mode": "allowed",
+      "runtime_blocked_hosts": ["*://*.your-bank.example"]
+    }
+  }
+}</code></pre>
+              </div>
+            </div>
+
+            <ul>
+              <li>Inventory installed extensions across the fleet and alert on new permissions after updates.</li>
+              <li>Use <code>runtime_blocked_hosts</code> to keep extensions off sensitive internal and SaaS
+                domains.</li>
+              <li>[Add anything specific your sample would have been stopped by]</li>
+            </ul>
+
+            <h3 id="defend-both">Both</h3>
+            <ul>
+              <li>Egress monitoring: alert on developer machines or browsers contacting newly registered domains.</li>
+              <li>An incident checklist for "a trusted dependency turned bad": identify affected versions, rotate
+                exposed secrets, pin to a known-good version, hunt for the IOCs.</li>
+            </ul>
+
+            <!-- ===================================================================== -->
+            <h2 id="iocs">Indicators of compromise</h2>
+
+            <div class="draft-note">
+              Defang everything. Include hashes, package/extension IDs and versions, and network indicators. Link to
+              the original advisory for each so readers can verify.
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Type</th><th>Value</th><th>Sample</th><th>Source</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>SHA-256</td><td><code>[...]</code></td><td>A</td><td>[link]</td></tr>
+                  <tr><td>Package</td><td><code>[name@version]</code></td><td>A</td><td>[link]</td></tr>
+                  <tr><td>Extension ID</td><td><code>[...]</code></td><td>B</td><td>[link]</td></tr>
+                  <tr><td>Domain</td><td><code>[evil[.]example]</code></td><td>[A/B]</td><td>[link]</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- ===================================================================== -->
+            <h2 id="takeaways">Takeaways</h2>
+            <ul>
+              <li>[Takeaway 1]</li>
+              <li>[Takeaway 2]</li>
+              <li>[Takeaway 3]</li>
+            </ul>
+
+            <!-- ===================================================================== -->
+            <h2 id="sources">Sources</h2>
+            <div class="draft-note">
+              Cite every advisory, vendor write-up and registry/store page you used. Starting points: GitHub
+              Advisory Database, npm security advisories, OSV.dev, Socket / Phylum / Snyk research blogs,
+              Chrome Web Store policy docs, and the incident write-ups for whichever samples you choose.
+            </div>
+            <ol>
+              <li>[Source 1]</li>
+              <li>[Source 2]</li>
+            </ol>
+
+          </section>
+
+          <footer class="page__meta">
+            <p class="page__taxonomy">
+              <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+              <span itemprop="keywords">
+                <a href="/tags/#security" class="page__taxonomy-item" rel="tag">security</a><span class="sep">, </span>
+                <a href="/tags/#javascript" class="page__taxonomy-item" rel="tag">javascript</a><span class="sep">, </span>
+                <a href="/tags/#supply-chain" class="page__taxonomy-item" rel="tag">supply-chain</a>
+              </span>
+            </p>
+            <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i>
+                Updated:</strong>
+              <time datetime="2026-10-05T12:00:00+03:00">Oct 5, 2026</time>
+            </p>
+          </footer>
+
+          <nav class="pagination">
+            <a href="#" class="pagination--pager disabled">Previous</a>
+            <a href="/abliteration/" class="pagination--pager"
+              title="The Uncensoring Machine: How Abliteration Removes Guardrails From Open Models">Next</a>
+          </nav>
+
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div id="footer" class="page__footer">
+    <footer>
+      <div class="page__footer-follow">
+        <ul class="social-icons">
+          <li><a href="https://twitter.com/9h4wk" rel="noopener noreferrer" target="_blank"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+          <li><a href="https://github.com/9h4wk" rel="noopener noreferrer" target="_blank"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+          <li><a href="https://tryhackme.com/p/JayB1ack" rel="noopener noreferrer" target="_blank"><i class="fas fa-fw fa-flag" aria-hidden="true"></i> TryHackMe</a></li>
+          <li><a href="/about/"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="page__footer-copyright">&copy; 2026 9h4wk (James Maweu)</div>
+    </footer>
+  </div>
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="/assets/js/custom.js" defer></script>
+
+</body>
+
+</html>
